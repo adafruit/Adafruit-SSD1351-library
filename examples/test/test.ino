@@ -21,13 +21,13 @@
 #include <SPI.h>
 
 // Option 1: use any pins but a little slower
-Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, mosi, sclk, rst);  
+//Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, mosi, sclk, rst);  
 
 // Option 2: must use the hardware SPI pins 
 // (for UNO thats sclk = 13 and sid = 11) and pin 10 must be 
 // an output. This is much faster - also required if you want
 // to use the microSD card (see the image drawing example)
-//Adafruit_SSD1331 tft = Adafruit_SSD1331(cs, dc, rst);
+Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
 
 float p = 3.1415926;
 
@@ -41,12 +41,12 @@ void fillpixelbypixel(uint16_t color) {
 }
 
 void setup(void) {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.print("hello!");
   tft.begin();
 
   Serial.println("init");
-  
+
   uint16_t time = millis();
   tft.fillRect(0, 0, 128, 128, BLACK);
   time = millis() - time;
@@ -60,7 +60,7 @@ void setup(void) {
   tft.invert(true);
   delay(100);
   tft.invert(false);
-  delay(00);
+  delay(100);
 
   tft.fillScreen(BLACK);
   testdrawtext("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur adipiscing ante sed nibh tincidunt feugiat. Maecenas enim massa, fringilla sed malesuada et, malesuada sit amet turpis. Sed porttitor neque ut ante pretium vitae malesuada nunc bibendum. Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. In vestibulum purus a tortor imperdiet posuere. ", WHITE);
@@ -221,6 +221,7 @@ void testroundrects() {
     w-=4;
     h-=6;
     color+=1100;
+    Serial.println(i);
   }
 }
 
@@ -294,14 +295,21 @@ void lcdTestPattern(void)
   {
     for(j=0;j<128;j++)
     {
-      if(i<16){tft.writeData(RED>>8);tft.writeData(RED);}
-      else if(i<32){tft.writeData(YELLOW>>8);tft.writeData(YELLOW);}
+      if(i<16){
+        tft.writeData(RED>>8); tft.writeData(RED);
+      }
+      else if(i<32) {
+        tft.writeData(YELLOW>>8);tft.writeData(YELLOW);
+      }
       else if(i<48){tft.writeData(GREEN>>8);tft.writeData(GREEN);}
       else if(i<64){tft.writeData(CYAN>>8);tft.writeData(CYAN);}
       else if(i<80){tft.writeData(BLUE>>8);tft.writeData(BLUE);}
       else if(i<96){tft.writeData(MAGENTA>>8);tft.writeData(MAGENTA);}
       else if(i<112){tft.writeData(BLACK>>8);tft.writeData(BLACK);}
-      else {tft.writeData(WHITE>>8);tft.writeData(WHITE);}
+      else {
+        tft.writeData(WHITE>>8);      
+        tft.writeData(WHITE);
+       }
     }
   }
 }

@@ -31,6 +31,9 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
     
     if (!_sid) {
         SPI.transfer(c);
+	// might be able to make this even faster but
+	// a delay -is- required
+	delayMicroseconds(1);
         return;
     }
     
@@ -83,7 +86,7 @@ void Adafruit_SSD1351::writeData(uint8_t c) {
     *portOutputRegister(csport) &= ~ cspin;
     //digitalWrite(_cs, LOW);
     
-    //Serial.print("D ");
+//    Serial.print("D ");
     spiwrite(c);
     
     *portOutputRegister(csport) |= cspin;
@@ -146,11 +149,12 @@ void Adafruit_SSD1351::fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
     w = SSD1351WIDTH - x - 1;
   }
   
+  /*
   Serial.print(x); Serial.print(", ");
   Serial.print(y); Serial.print(", ");
   Serial.print(w); Serial.print(", ");
   Serial.print(h); Serial.println(", ");
-
+*/
 
   // set location
   writeCommand(SSD1351_CMD_SETCOLUMN);
@@ -175,10 +179,12 @@ void Adafruit_SSD1351::drawFastVLine(int16_t x, int16_t y,
 	return;
 
   // X bounds check
-  if (y+h > SSD1351WIDTH)
+  if (y+h > SSD1351HEIGHT)
   {
-    h = SSD1351WIDTH - y - 1;
+    h = SSD1351HEIGHT - y - 1;
   }
+
+  if (h < 0) return;
 
   // set location
   writeCommand(SSD1351_CMD_SETCOLUMN);
@@ -209,6 +215,8 @@ void Adafruit_SSD1351::drawFastHLine(int16_t x, int16_t y,
   {
     w = SSD1351WIDTH - x - 1;
   }
+
+  if (w < 0) return;
 
   // set location
   writeCommand(SSD1351_CMD_SETCOLUMN);
