@@ -1,10 +1,10 @@
 /*************************************************** 
   This is a example sketch demonstrating bitmap drawing
-  capabilities of the SSD1331 library  for the 0.96" 
-  16-bit Color OLED with SSD1331 driver chip
+  capabilities of the SSD1351 library  for the 1.5" 
+  16-bit Color OLED with SSD1351 driver chip
 
   Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/684
+  ------> http://www.adafruit.com/products/1431
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface

@@ -1,8 +1,8 @@
 /*************************************************** 
-  This is a library for the 0.96" 16-bit Color OLED with SSD1331 driver chip
+  This is a library for the 1.5" 16-bit Color OLED with SSD1331 driver chip
 
   Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/684
+  ------> http://www.adafruit.com/products/1341
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface
