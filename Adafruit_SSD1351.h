@@ -1,8 +1,10 @@
 /*************************************************** 
-  This is a library for the 1.5" 16-bit Color OLED with SSD1331 driver chip
+  This is a library for the 1.5" & 1.27" 16-bit Color OLEDs 
+  with SSD1331 driver chip
 
   Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/1341
+  ------> http://www.adafruit.com/products/1431
+  ------> http://www.adafruit.com/products/1673
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface
@@ -13,6 +15,9 @@
   Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
  ****************************************************/
+
+#define SSD1351WIDTH 128
+#define SSD1351HEIGHT 128  // SET THIS TO 96 FOR 1.27"!
 
 #define swap(a, b) { uint16_t t = a; a = b; b = t; }
 
@@ -31,7 +36,7 @@
 #endif
 
 // Timing Delays
-#define SSD1351_DELAYS_HWFILL		(3)
+#define SSD1351_DELAYS_HWFILL	    (3)
 #define SSD1351_DELAYS_HWLINE       (1)
 
 // SSD1351 Commands
@@ -66,9 +71,6 @@
 #define SSD1351_CMD_HORIZSCROLL         0x96
 #define SSD1351_CMD_STOPSCROLL          0x9E
 #define SSD1351_CMD_STARTSCROLL         0x9F
-
-#define SSD1351WIDTH 128
-#define SSD1351HEIGHT 128
 
 
 class Adafruit_SSD1351  : public virtual Adafruit_GFX {

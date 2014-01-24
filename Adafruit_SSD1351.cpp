@@ -1,9 +1,10 @@
 /*************************************************** 
-  This is a library for the 1.5" 16-bit Color OLED with SSD1331 driver chip
+  This is a library for the 1.5" & 1.27" 16-bit Color OLEDs 
+  with SSD1331 driver chip
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1431
-
+  ------> http://www.adafruit.com/products/1673
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface
@@ -123,7 +124,7 @@ uint16_t Adafruit_SSD1351::Color565(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void Adafruit_SSD1351::fillScreen(uint16_t fillcolor) {
-  fillRect(0, 0, 128, 128, fillcolor);
+  fillRect(0, 0, SSD1351WIDTH, SSD1351HEIGHT, fillcolor);
 }
 
 /**************************************************************************/
@@ -316,7 +317,12 @@ void Adafruit_SSD1351::begin(void) {
     writeData(0x7F);
 
     writeCommand(SSD1351_CMD_STARTLINE); 		// 0xA1
-    writeData(0x0);
+    if (SSD1351HEIGHT == 96) {
+      writeData(96);
+    } else {
+      writeData(0);
+    }
+
 
     writeCommand(SSD1351_CMD_DISPLAYOFFSET); 	// 0xA2
     writeData(0x0);
@@ -368,7 +374,7 @@ void  Adafruit_SSD1351::invert(boolean v) {
 
 /********************************* low level pin initialization */
 
-Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t sclk, uint8_t rst) : Adafruit_GFX(128, 128) {
+Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t sclk, uint8_t rst) : Adafruit_GFX(SSD1351WIDTH, SSD1351HEIGHT) {
     _cs = cs;
     _rs = rs;
     _sid = sid;
@@ -376,7 +382,7 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t 
     _rst = rst;
 }
 
-Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafruit_GFX(128, 128) {
+Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafruit_GFX(SSD1351WIDTH, SSD1351HEIGHT) {
     _cs = cs;
     _rs = rs;
     _sid = 0;
