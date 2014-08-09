@@ -1,13 +1,10 @@
 /*************************************************** 
   This is a example sketch demonstrating bitmap drawing
-  for the 1.5" & 1.27" 16-bit Color OLEDs with SSD1331 driver chip
+  capabilities of the SSD1351 library  for the 1.5" 
+  16-bit Color OLED with SSD1351 driver chip
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1431
-  ------> http://www.adafruit.com/products/1673
-
-  If you're using a 1.27" OLED, change SSD1351HEIGHT in Adafruit_SSD1351.h
-	to 96 instead of 128
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface
@@ -45,13 +42,13 @@
 #include <SPI.h>
 
 // Option 1: use any pins but a little slower
-Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, mosi, sclk, rst);  
+//Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, mosi, sclk, rst);  
 
 // Option 2: must use the hardware SPI pins 
 // (for UNO thats sclk = 13 and sid = 11) and pin 10 must be 
 // an output. This is much faster - also required if you want
 // to use the microSD card (see the image drawing example)
-//Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
+Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
 
 float p = 3.1415926;
 
@@ -65,7 +62,7 @@ void fillpixelbypixel(uint16_t color) {
 }
 
 void setup(void) {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.print("hello!");
   tft.begin();
 

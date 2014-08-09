@@ -20,10 +20,16 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1351.h"
 #include "glcdfont.c"
-#include <avr/pgmspace.h>
+#ifdef __AVR__
+    #include <avr/pgmspace.h>
+#endif
 #include "pins_arduino.h"
 #include "wiring_private.h"
 #include <SPI.h>
+
+#ifndef _BV
+    #define _BV(bit) (1<<(bit))
+#endif
 
 /********************************** low level pin interface */
 
@@ -39,59 +45,56 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
         return;
     }
     
-    volatile uint8_t *sclkportreg = portOutputRegister(sclkport);
-    volatile uint8_t *sidportreg = portOutputRegister(sidport);
-    
     int8_t i;
     
-    *sclkportreg |= sclkpin;
+    *sclkport |= sclkpinmask;
     
     for (i=7; i>=0; i--) {
-        *sclkportreg &= ~sclkpin;
+        *sclkport &= ~sclkpinmask;
         //SCLK_PORT &= ~_BV(SCLK);
         
         if (c & _BV(i)) {
-            *sidportreg |= sidpin;
+            *sidport |= sidpinmask;
             //digitalWrite(_sid, HIGH);
             //SID_PORT |= _BV(SID);
         } else {
-            *sidportreg &= ~sidpin;
+            *sidport &= ~sidpinmask;
             //digitalWrite(_sid, LOW);
             //SID_PORT &= ~_BV(SID);
         }
         
-        *sclkportreg |= sclkpin;
+        *sclkport |= sclkpinmask;
         //SCLK_PORT |= _BV(SCLK);
     }
 }
 
 
 void Adafruit_SSD1351::writeCommand(uint8_t c) {
-    *portOutputRegister(rsport) &= ~ rspin;
+    *rsport &= ~ rspinmask;
     //digitalWrite(_rs, LOW);
     
-    *portOutputRegister(csport) &= ~ cspin;
+    *csport &= ~ cspinmask;
     //digitalWrite(_cs, LOW);
     
     //Serial.print("C ");
     spiwrite(c);
     
-    *portOutputRegister(csport) |= cspin;
+    *csport |= cspinmask;
     //digitalWrite(_cs, HIGH);
 }
 
 
 void Adafruit_SSD1351::writeData(uint8_t c) {
-    *portOutputRegister(rsport) |= rspin;
+    *rsport |= rspinmask;
     //digitalWrite(_rs, HIGH);
     
-    *portOutputRegister(csport) &= ~ cspin;
+    *csport &= ~ cspinmask;
     //digitalWrite(_cs, LOW);
     
 //    Serial.print("D ");
     spiwrite(c);
     
-    *portOutputRegister(csport) |= cspin;
+    *csport |= cspinmask;
     //digitalWrite(_cs, HIGH);
 } 
 
@@ -246,13 +249,13 @@ void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
   goTo(x, y);
   
   // setup for data
-  *portOutputRegister(rsport) |= rspin;
-  *portOutputRegister(csport) &= ~ cspin;
+  *rsport |= rspinmask;
+  *csport &= ~ cspinmask;
   
   spiwrite(color >> 8);    
   spiwrite(color);
   
-  *portOutputRegister(csport) |= cspin;  
+  *csport |= cspinmask;
 }
 
 void Adafruit_SSD1351::begin(void) {
@@ -261,12 +264,8 @@ void Adafruit_SSD1351::begin(void) {
     
     if (_sclk) {
         pinMode(_sclk, OUTPUT);
-        sclkport = digitalPinToPort(_sclk);
-        sclkpin = digitalPinToBitMask(_sclk);
         
         pinMode(_sid, OUTPUT);
-        sidport = digitalPinToPort(_sid);
-        sidpin = digitalPinToBitMask(_sid);
     } else {
         // using the hardware SPI
         SPI.begin();
@@ -276,11 +275,6 @@ void Adafruit_SSD1351::begin(void) {
     // Toggle RST low to reset; CS low so it'll listen to us
     pinMode(_cs, OUTPUT);
     digitalWrite(_cs, LOW);
-    cspin = digitalPinToBitMask(_cs);
-    csport = digitalPinToPort(_cs);
-    
-    rspin = digitalPinToBitMask(_rs);
-    rsport = digitalPinToPort(_rs);
     
     if (_rst) {
         pinMode(_rst, OUTPUT);
@@ -380,6 +374,19 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t 
     _sid = sid;
     _sclk = sclk;
     _rst = rst;
+    
+    csport      = portOutputRegister(digitalPinToPort(cs));
+    cspinmask   = digitalPinToBitMask(cs);
+
+    rsport      = portOutputRegister(digitalPinToPort(rs));
+    rspinmask   = digitalPinToBitMask(rs);
+
+    sidport      = portOutputRegister(digitalPinToPort(sid));
+    sidpinmask   = digitalPinToBitMask(sid);
+
+    sclkport      = portOutputRegister(digitalPinToPort(sclk));
+    sclkpinmask   = digitalPinToBitMask(sclk);
+
 }
 
 Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafruit_GFX(SSD1351WIDTH, SSD1351HEIGHT) {
@@ -388,9 +395,14 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafr
     _sid = 0;
     _sclk = 0;
     _rst = rst;
+
+    csport      = portOutputRegister(digitalPinToPort(cs));
+    cspinmask   = digitalPinToBitMask(cs);
+    
+    rsport      = portOutputRegister(digitalPinToPort(rs));
+    rspinmask   = digitalPinToBitMask(rs);
+
 }
-
-
 
 
 

@@ -27,6 +27,14 @@
 #include "WProgram.h"
 #endif
 
+#ifdef __SAM3X8E__
+    typedef volatile RwReg PortReg;
+    typedef uint32_t PortMask;
+#else
+    typedef volatile uint8_t PortReg;
+    typedef uint8_t PortMask;
+#endif
+
 // Select one of these defines to set the pixel color order
 #define SSD1351_COLORORDER_RGB
 // #define SSD1351_COLORORDER_BGR
@@ -109,6 +117,6 @@ class Adafruit_SSD1351  : public virtual Adafruit_GFX {
   void spiwrite(uint8_t);
 
   uint8_t _cs, _rs, _rst, _sid, _sclk;
-  uint8_t csport, rsport, sidport, sclkport;
-  uint8_t cspin, rspin, sidpin, sclkpin;
+  PortReg *csport, *rsport, *sidport, *sclkport;
+  PortMask cspinmask, rspinmask, sidpinmask, sclkpinmask;
 };

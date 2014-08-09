@@ -1,13 +1,10 @@
 /*************************************************** 
   This is a example sketch demonstrating bitmap drawing
-  for the 1.5" & 1.27" 16-bit Color OLEDs with SSD1331 driver chip
+  capabilities of the SSD1351 library  for the 1.5" 
+  16-bit Color OLED with SSD1351 driver chip
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1431
-  ------> http://www.adafruit.com/products/1673
-
-  If you're using a 1.27" OLED, change SSD1351HEIGHT in Adafruit_SSD1351.h
-	to 96 instead of 128
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface
@@ -32,9 +29,9 @@
 // If we are using the hardware SPI interface, these are the pins (for future ref)
 #define sclk 13
 #define mosi 11
-#define cs   10
-#define rst  9
-#define dc   8
+#define cs   5
+#define rst  6
+#define dc   4
 
 // Color definitions
 #define	BLACK           0x0000
@@ -51,8 +48,8 @@ Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
 
 // For Arduino Uno/Duemilanove, etc
 //  connect the SD card with MOSI going to pin 11, MISO going to pin 12 and SCK going to pin 13 (standard)
-//  Then pin 4 goes to CS (or whatever you have set up)
-#define SD_CS 4    // Set the chip select line to whatever you use (4 doesnt conflict with the library)
+//  Then pin 10 goes to CS (or whatever you have set up)
+#define SD_CS 10    // Set the chip select line to whatever you use (10 doesnt conflict with the library)
 
 // the file itself
 File bmpFile;

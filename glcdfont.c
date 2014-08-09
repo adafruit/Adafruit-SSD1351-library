@@ -1,6 +1,10 @@
-#include <avr/io.h>
-#include <avr/pgmspace.h> 
- 
+#ifdef __AVR__
+    #include <avr/io.h>
+    #include <avr/pgmspace.h>
+#else
+    #define PROGMEM
+#endif
+
 #ifndef FONT5X7_H
 #define FONT5X7_H
 
