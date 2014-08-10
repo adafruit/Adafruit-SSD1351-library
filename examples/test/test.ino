@@ -1,10 +1,14 @@
 /*************************************************** 
-  This is a example sketch demonstrating bitmap drawing
-  capabilities of the SSD1351 library  for the 1.5" 
-  16-bit Color OLED with SSD1351 driver chip
+  This is a example sketch demonstrating graphic drawing
+  capabilities of the SSD1351 library for the 1.5" 
+  and 1.27" 16-bit Color OLEDs with SSD1351 driver chip
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1431
+  ------> http://www.adafruit.com/products/1673
+ 
+  If you're using a 1.27" OLED, change SSD1351HEIGHT in Adafruit_SSD1351.h
+ 	to 96 instead of 128
 
   These displays use SPI to communicate, 4 or 5 pins are required to  
   interface
