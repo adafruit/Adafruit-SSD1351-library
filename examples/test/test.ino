@@ -72,6 +72,14 @@ void setup(void) {
 
   Serial.println("init");
 
+  // You can optionally rotate the display by running the line below.
+  // Note that a value of 0 means no rotation, 1 means 90 clockwise,
+  // 2 means 180 degrees clockwise, and 3 means 270 degrees clockwise.
+  //tft.setRotation(1);
+  // NOTE: The test pattern at the start will NOT be rotated!  The code
+  // for rendering the test pattern talks directly to the display and
+  // ignores any rotation.
+
   uint16_t time = millis();
   tft.fillRect(0, 0, 128, 128, BLACK);
   time = millis() - time;

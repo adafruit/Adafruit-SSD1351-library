@@ -130,17 +130,11 @@ void Adafruit_SSD1351::fillScreen(uint16_t fillcolor) {
   fillRect(0, 0, SSD1351WIDTH, SSD1351HEIGHT, fillcolor);
 }
 
-/**************************************************************************/
-/*! 
-    @brief  Draws a filled rectangle using HW acceleration
-*/
-/**************************************************************************/
-void Adafruit_SSD1351::fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor) 
-{	
-
+// Draw a filled rectangle with no rotation.
+void Adafruit_SSD1351::rawFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor) {
   // Bounds check
   if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
-	return;
+    return;
 
   // Y bounds check
   if (y+h > SSD1351HEIGHT)
@@ -177,43 +171,40 @@ void Adafruit_SSD1351::fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
   }
 }
 
-void Adafruit_SSD1351::drawFastVLine(int16_t x, int16_t y, 
-				 int16_t h, uint16_t color) {
-  // Bounds check
-  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
-	return;
-
-  // X bounds check
-  if (y+h > SSD1351HEIGHT)
-  {
-    h = SSD1351HEIGHT - y - 1;
-  }
-
-  if (h < 0) return;
-
-  // set location
-  writeCommand(SSD1351_CMD_SETCOLUMN);
-  writeData(x);
-  writeData(x);
-  writeCommand(SSD1351_CMD_SETROW);
-  writeData(y);
-  writeData(y+h-1);
-  // fill!
-  writeCommand(SSD1351_CMD_WRITERAM);  
-
-  for (uint16_t i=0; i < h; i++) {
-    writeData(color >> 8);
-    writeData(color);
+/**************************************************************************/
+/*!
+    @brief  Draws a filled rectangle using HW acceleration
+*/
+/**************************************************************************/
+void Adafruit_SSD1351::fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor) {
+  // Transform x and y based on current rotation.
+  switch (getRotation()) {
+  case 0:  // No rotation
+    rawFillRect(x, y, w, h, fillcolor);
+    break;
+  case 1:  // Rotated 90 degrees clockwise.
+    swap(x, y);
+    x = WIDTH - x - h;
+    rawFillRect(x, y, h, w, fillcolor);
+    break;
+  case 2:  // Rotated 180 degrees clockwise.
+    x = WIDTH - x - w;
+    y = HEIGHT - y - h;
+    rawFillRect(x, y, w, h, fillcolor);
+    break;
+  case 3:  // Rotated 270 degrees clockwise.
+    swap(x, y);
+    y = HEIGHT - y - w;
+    rawFillRect(x, y, h, w, fillcolor);
+    break;
   }
 }
 
-
-
-void Adafruit_SSD1351::drawFastHLine(int16_t x, int16_t y, 
-				 int16_t w, uint16_t color) {
+// Draw a horizontal line ignoring any screen rotation.
+void Adafruit_SSD1351::rawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
   // Bounds check
   if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
-	return;
+    return;
 
   // X bounds check
   if (x+w > SSD1351WIDTH)
@@ -239,10 +230,104 @@ void Adafruit_SSD1351::drawFastHLine(int16_t x, int16_t y,
   }
 }
 
+// Draw a vertical line ignoring any screen rotation.
+void Adafruit_SSD1351::rawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
+  // Bounds check
+  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
+  return;
 
+  // X bounds check
+  if (y+h > SSD1351HEIGHT)
+  {
+    h = SSD1351HEIGHT - y - 1;
+  }
+
+  if (h < 0) return;
+
+  // set location
+  writeCommand(SSD1351_CMD_SETCOLUMN);
+  writeData(x);
+  writeData(x);
+  writeCommand(SSD1351_CMD_SETROW);
+  writeData(y);
+  writeData(y+h-1);
+  // fill!
+  writeCommand(SSD1351_CMD_WRITERAM);  
+
+  for (uint16_t i=0; i < h; i++) {
+    writeData(color >> 8);
+    writeData(color);
+  }
+}
+
+void Adafruit_SSD1351::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
+  // Transform x and y based on current rotation.
+  switch (getRotation()) {
+  case 0:  // No rotation
+    rawFastVLine(x, y, h, color);
+    break;
+  case 1:  // Rotated 90 degrees clockwise.
+    swap(x, y);
+    x = WIDTH - x - h;
+    rawFastHLine(x, y, h, color);
+    break;
+  case 2:  // Rotated 180 degrees clockwise.
+    x = WIDTH - x - 1;
+    y = HEIGHT - y - h;
+    rawFastVLine(x, y, h, color);
+    break;
+  case 3:  // Rotated 270 degrees clockwise.
+    swap(x, y);
+    y = HEIGHT - y - 1;
+    rawFastHLine(x, y, h, color);
+    break;
+  }
+}
+
+void Adafruit_SSD1351::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
+  // Transform x and y based on current rotation.
+  switch (getRotation()) {
+  case 0:  // No rotation.
+    rawFastHLine(x, y, w, color);
+    break;
+  case 1:  // Rotated 90 degrees clockwise.
+    swap(x, y);
+    x = WIDTH - x - 1;
+    rawFastVLine(x, y, w, color);
+    break;
+  case 2:  // Rotated 180 degrees clockwise.
+    x = WIDTH - x - w;
+    y = HEIGHT - y - 1;
+    rawFastHLine(x, y, w, color);
+    break;
+  case 3:  // Rotated 270 degrees clockwise.
+    swap(x, y);
+    y = HEIGHT - y - w;
+    rawFastVLine(x, y, w, color);
+    break;
+  }
+}
 
 void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
+  // Transform x and y based on current rotation.
+  switch (getRotation()) {
+  // Case 0: No rotation
+  case 1:  // Rotated 90 degrees clockwise.
+    swap(x, y);
+    x = WIDTH - x - 1;
+    break;
+  case 2:  // Rotated 180 degrees clockwise.
+    x = WIDTH - x - 1;
+    y = HEIGHT - y - 1;
+    break;
+  case 3:  // Rotated 270 degrees clockwise.
+    swap(x, y);
+    y = HEIGHT - y - 1;
+    break;
+  }
+
+  // Bounds check.
   if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT)) return;
   if ((x < 0) || (y < 0)) return;
 
