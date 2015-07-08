@@ -20,8 +20,10 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1351.h"
 #include "glcdfont.c"
-#ifdef __AVR__
-    #include <avr/pgmspace.h>
+#ifdef __AVR
+  #include <avr/pgmspace.h>
+#elif defined(ESP8266)
+  #include <pgmspace.h>
 #endif
 #include "pins_arduino.h"
 #include "wiring_private.h"
