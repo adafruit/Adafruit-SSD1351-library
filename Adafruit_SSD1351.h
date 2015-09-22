@@ -19,7 +19,10 @@
 #define SSD1351WIDTH 128
 #define SSD1351HEIGHT 128  // SET THIS TO 96 FOR 1.27"!
 
-#define swap(a, b) { uint16_t t = a; a = b; b = t; }
+#ifdef ESP8266
+#else
+    #define swap(a, b) { uint16_t t = a; a = b; b = t; }
+#endif
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"

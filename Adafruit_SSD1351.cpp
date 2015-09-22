@@ -49,55 +49,75 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
     
     int8_t i;
     
-    *sclkport |= sclkpinmask;
-    
-    for (i=7; i>=0; i--) {
-        *sclkport &= ~sclkpinmask;
-        //SCLK_PORT &= ~_BV(SCLK);
+    #ifdef ESP8266
+        digitalWrite(_sclk, HIGH);
         
-        if (c & _BV(i)) {
-            *sidport |= sidpinmask;
-            //digitalWrite(_sid, HIGH);
-            //SID_PORT |= _BV(SID);
-        } else {
-            *sidport &= ~sidpinmask;
-            //digitalWrite(_sid, LOW);
-            //SID_PORT &= ~_BV(SID);
+        for (i=7; i>=0; i--) {
+            digitalWrite(_sclk, LOW);
+            
+            if (c & _BV(i)) {
+                digitalWrite(_sid, HIGH);
+            } else {
+                digitalWrite(_sid, LOW);
+            }
+            digitalWrite(_sclk, HIGH);
         }
-        
+    #else
         *sclkport |= sclkpinmask;
-        //SCLK_PORT |= _BV(SCLK);
-    }
+        
+        for (i=7; i>=0; i--) {
+            *sclkport &= ~sclkpinmask;
+            
+            if (c & _BV(i)) {
+                *sidport |= sidpinmask;
+            } else {
+                *sidport &= ~sidpinmask;
+            }
+            *sclkport |= sclkpinmask;
+        }
+    #endif
 }
 
 
 void Adafruit_SSD1351::writeCommand(uint8_t c) {
-    *rsport &= ~ rspinmask;
-    //digitalWrite(_rs, LOW);
-    
-    *csport &= ~ cspinmask;
-    //digitalWrite(_cs, LOW);
-    
-    //Serial.print("C ");
-    spiwrite(c);
-    
-    *csport |= cspinmask;
-    //digitalWrite(_cs, HIGH);
+    #ifdef ESP8266
+        digitalWrite(_rs, LOW);
+        
+        digitalWrite(_cs, LOW);
+        
+        spiwrite(c);
+        
+        digitalWrite(_cs, HIGH);
+    #else
+        *rsport &= ~ rspinmask;
+        
+        *csport &= ~ cspinmask;
+        
+        spiwrite(c);
+        
+        *csport |= cspinmask;
+    #endif
 }
 
 
 void Adafruit_SSD1351::writeData(uint8_t c) {
-    *rsport |= rspinmask;
-    //digitalWrite(_rs, HIGH);
-    
-    *csport &= ~ cspinmask;
-    //digitalWrite(_cs, LOW);
-    
-//    Serial.print("D ");
-    spiwrite(c);
-    
-    *csport |= cspinmask;
-    //digitalWrite(_cs, HIGH);
+    #ifdef ESP8266
+        digitalWrite(_rs, HIGH);
+        
+        digitalWrite(_cs, LOW);
+        
+        spiwrite(c);
+        
+        digitalWrite(_cs, HIGH);
+    #else
+        *rsport |= rspinmask;
+        
+        *csport &= ~ cspinmask;
+        
+        spiwrite(c);
+        
+        *csport |= cspinmask;
+    #endif
 } 
 
 /***********************************/
@@ -336,13 +356,23 @@ void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
   goTo(x, y);
   
   // setup for data
-  *rsport |= rspinmask;
-  *csport &= ~ cspinmask;
-  
-  spiwrite(color >> 8);    
-  spiwrite(color);
-  
-  *csport |= cspinmask;
+    #ifdef ESP8266
+        digitalWrite(_rs, HIGH);
+        digitalWrite(_cs, LOW);
+
+        spiwrite(color >> 8);    
+        spiwrite(color);
+
+        digitalWrite(_cs, HIGH);
+    #else
+        *rsport |= rspinmask;
+        *csport &= ~ cspinmask;
+
+        spiwrite(color >> 8);    
+        spiwrite(color);
+
+        *csport |= cspinmask;
+    #endif
 }
 
 void Adafruit_SSD1351::begin(void) {
@@ -356,7 +386,12 @@ void Adafruit_SSD1351::begin(void) {
     } else {
         // using the hardware SPI
         SPI.begin();
-        SPI.setDataMode(SPI_MODE3);
+        #ifdef ESP8266
+            SPI.setFrequency(8000000L);
+        #else
+            SPI.setClockDivider((F_CPU + 4000000L) / 8000000L);
+            SPI.setDataMode(SPI_MODE3);
+        #endif
     }
 	
     // Toggle RST low to reset; CS low so it'll listen to us
@@ -462,17 +497,20 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t 
     _sclk = sclk;
     _rst = rst;
     
-    csport      = portOutputRegister(digitalPinToPort(cs));
-    cspinmask   = digitalPinToBitMask(cs);
+    #ifdef ESP8266
+    #else
+        csport      = portOutputRegister(digitalPinToPort(cs));
+        cspinmask   = digitalPinToBitMask(cs);
 
-    rsport      = portOutputRegister(digitalPinToPort(rs));
-    rspinmask   = digitalPinToBitMask(rs);
+        rsport      = portOutputRegister(digitalPinToPort(rs));
+        rspinmask   = digitalPinToBitMask(rs);
 
-    sidport      = portOutputRegister(digitalPinToPort(sid));
-    sidpinmask   = digitalPinToBitMask(sid);
+        sidport      = portOutputRegister(digitalPinToPort(sid));
+        sidpinmask   = digitalPinToBitMask(sid);
 
-    sclkport      = portOutputRegister(digitalPinToPort(sclk));
-    sclkpinmask   = digitalPinToBitMask(sclk);
+        sclkport      = portOutputRegister(digitalPinToPort(sclk));
+        sclkpinmask   = digitalPinToBitMask(sclk);
+    #endif
 
 }
 
@@ -483,11 +521,14 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafr
     _sclk = 0;
     _rst = rst;
 
-    csport      = portOutputRegister(digitalPinToPort(cs));
-    cspinmask   = digitalPinToBitMask(cs);
-    
-    rsport      = portOutputRegister(digitalPinToPort(rs));
-    rspinmask   = digitalPinToBitMask(rs);
+    #ifdef ESP8266
+    #else
+        csport      = portOutputRegister(digitalPinToPort(cs));
+        cspinmask   = digitalPinToBitMask(cs);
+        
+        rsport      = portOutputRegister(digitalPinToPort(rs));
+        rspinmask   = digitalPinToBitMask(rs);
+    #endif
 
 }
 
