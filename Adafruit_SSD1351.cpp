@@ -132,6 +132,26 @@ void Adafruit_SSD1351::fillScreen(uint16_t fillcolor) {
   fillRect(0, 0, SSD1351WIDTH, SSD1351HEIGHT, fillcolor);
 }
 
+void Adafruit_SSD1351::quickFill(uint16_t fillcolor) {
+  writeCommand(SSD1351_CMD_SETCOLUMN);
+  writeData(0);
+  writeData(SSD1351WIDTH-1);
+
+  writeCommand(SSD1351_CMD_SETROW);
+  writeData(0);
+  writeData(SSD1351HEIGHT-1);
+  writeCommand(SSD1351_CMD_WRITERAM);
+
+  *rsport |= rspinmask;
+  *csport &= ~ cspinmask;
+
+  for (uint16_t i=0; i < SSD1351HEIGHT*SSD1351WIDTH; i++) {
+    SPI.transfer(fillcolor >> 8);
+    SPI.transfer(fillcolor);
+  }
+  *csport |= cspinmask;
+}
+
 // Draw a filled rectangle with no rotation.
 void Adafruit_SSD1351::rawFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor) {
   // Bounds check
