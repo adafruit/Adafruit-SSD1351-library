@@ -27,7 +27,7 @@
 #include "WProgram.h"
 #endif
 
-#ifdef __SAM3X8E__
+#if defined(__SAM3X8E__) || defined(ARDUINO_ARCH_SAMD)
     typedef volatile RwReg PortReg;
     typedef uint32_t PortMask;
 #else
