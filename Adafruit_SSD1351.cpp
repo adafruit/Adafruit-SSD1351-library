@@ -33,6 +33,14 @@
     #define _BV(bit) (1<<(bit))
 #endif
 
+#if F_CPU > 72000000 && SPI_HAS_TRANSACTION
+#define BEGIN_SPI_TRANSACTION SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0))
+#define END_SPI_TRANSACTION SPI.endTransaction()
+#else
+#define BEGIN_SPI_TRANSACTION
+#define END_SPI_TRANSACTION
+#endif
+
 /********************************** low level pin interface */
 
 inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
@@ -41,9 +49,9 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
     
     if (!_sid) {
         SPI.transfer(c);
-	// might be able to make this even faster but
-	// a delay -is- required
-	delayMicroseconds(1);
+        // might be able to make this even faster but
+        // a delay -is- required
+        delayMicroseconds(1);
         return;
     }
     
@@ -72,6 +80,7 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
 
 
 void Adafruit_SSD1351::writeCommand(uint8_t c) {
+    BEGIN_SPI_TRANSACTION;
     *rsport &= ~ rspinmask;
     //digitalWrite(_rs, LOW);
     
@@ -83,10 +92,12 @@ void Adafruit_SSD1351::writeCommand(uint8_t c) {
     
     *csport |= cspinmask;
     //digitalWrite(_cs, HIGH);
+    END_SPI_TRANSACTION;
 }
 
 
 void Adafruit_SSD1351::writeData(uint8_t c) {
+    BEGIN_SPI_TRANSACTION;
     *rsport |= rspinmask;
     //digitalWrite(_rs, HIGH);
     
@@ -98,6 +109,7 @@ void Adafruit_SSD1351::writeData(uint8_t c) {
     
     *csport |= cspinmask;
     //digitalWrite(_cs, HIGH);
+    END_SPI_TRANSACTION;
 } 
 
 /***********************************/
@@ -338,7 +350,6 @@ void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
   // setup for data
   *rsport |= rspinmask;
   *csport &= ~ cspinmask;
-  
   spiwrite(color >> 8);    
   spiwrite(color);
   
