@@ -27,9 +27,13 @@
 #include "WProgram.h"
 #endif
 
-#ifdef __SAM3X8E__
+#if defined (__SAM3X8E__) || (ARDUINO_ARCH_SAMD)
     typedef volatile RwReg PortReg;
     typedef uint32_t PortMask;
+//couldn't get EP8266 to work for some reason.  R.Lesniak
+//#elif defined (ESP8266)
+//    typedef volatile uint32_t PortReg;
+//    typedef uint32_t PortMask;
 #else
     typedef volatile uint8_t PortReg;
     typedef uint8_t PortMask;
@@ -119,7 +123,7 @@ class Adafruit_SSD1351  : public virtual Adafruit_GFX {
   void rawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
   void rawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
 
-  uint8_t _cs, _rs, _rst, _sid, _sclk;
   PortReg *csport, *rsport, *sidport, *sclkport;
   PortMask cspinmask, rspinmask, sidpinmask, sclkpinmask;
+  uint8_t _cs, _rs, _rst, _sid, _sclk;
 };
