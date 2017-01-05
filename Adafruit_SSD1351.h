@@ -15,6 +15,8 @@
   Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
  ****************************************************/
+#ifndef SSD1351_H
+#define SSD1351_H
 
 #define SSD1351WIDTH 128
 #define SSD1351HEIGHT 128  // SET THIS TO 96 FOR 1.27"!
@@ -127,3 +129,5 @@ class Adafruit_SSD1351  : public virtual Adafruit_GFX {
   PortMask cspinmask, rspinmask, sidpinmask, sclkpinmask;
   uint8_t _cs, _rs, _rst, _sid, _sclk;
 };
+
+#endif // SSD1351_H
