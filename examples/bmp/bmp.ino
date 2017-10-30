@@ -31,8 +31,8 @@
 
 
 // If we are using the hardware SPI interface, these are the pins (for future ref)
-#define sclk 13
-#define mosi 11
+//#define sclk 13
+//#define mosi 11
 #define cs   5
 #define rst  6
 #define dc   4

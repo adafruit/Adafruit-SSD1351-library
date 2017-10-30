@@ -25,8 +25,8 @@
  ****************************************************/
 
 // You can use any (4 or) 5 pins 
-#define sclk 2
-#define mosi 3
+//#define sclk 2
+//#define mosi 3
 #define dc   4
 #define cs   5
 #define rst  6
@@ -46,13 +46,14 @@
 #include <SPI.h>
 
 // Option 1: use any pins but a little slower
-Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, mosi, sclk, rst);  
+// It can't be used with Arduino Primo / Primo Core
+// Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, mosi, sclk, rst);  
 
 // Option 2: must use the hardware SPI pins 
 // (for UNO thats sclk = 13 and sid = 11) and pin 10 must be 
 // an output. This is much faster - also required if you want
 // to use the microSD card (see the image drawing example)
-//Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
+Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
 
 float p = 3.1415926;
 
