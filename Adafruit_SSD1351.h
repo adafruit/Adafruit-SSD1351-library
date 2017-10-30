@@ -36,7 +36,7 @@
 //#elif defined (ESP8266)
 //    typedef volatile uint32_t PortReg;
 //    typedef uint32_t PortMask;
-#else
+#elseif !defined(NRF51) && !defined(NRF52) && !defined(__RFduino__) && !defined(NRF52_PRIMO_CORE) && !defined(NRF52_PRIMO)
     typedef volatile uint8_t PortReg;
     typedef uint8_t PortMask;
 #endif
@@ -89,7 +89,9 @@
 
 class Adafruit_SSD1351  : public virtual Adafruit_GFX {
  public:
+ #if !defined(NRF51) && !defined(NRF52) && !defined(__RFduino__) && !defined(NRF52_PRIMO_CORE) && !defined(NRF52_PRIMO)
   Adafruit_SSD1351(uint8_t CS, uint8_t RS, uint8_t SID, uint8_t SCLK, uint8_t RST);
+  #elseif
   Adafruit_SSD1351(uint8_t CS, uint8_t RS, uint8_t RST);
 
   uint16_t Color565(uint8_t r, uint8_t g, uint8_t b);
@@ -124,9 +126,10 @@ class Adafruit_SSD1351  : public virtual Adafruit_GFX {
   void rawFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor);
   void rawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
   void rawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-
+	#if !defined(NRF51) && !defined(NRF52) && !defined(__RFduino__) && !defined(NRF52_PRIMO_CORE) && !defined(NRF52_PRIMO)
   PortReg *csport, *rsport, *sidport, *sclkport;
   PortMask cspinmask, rspinmask, sidpinmask, sclkpinmask;
+  #elseif
   uint8_t _cs, _rs, _rst, _sid, _sclk;
 };
 
