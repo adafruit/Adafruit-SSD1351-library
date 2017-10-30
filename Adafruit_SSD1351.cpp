@@ -24,9 +24,10 @@
   #include <avr/pgmspace.h>
 #elif defined(ESP8266)
   #include <pgmspace.h>
-#elif defined defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+#elif defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
   #include <avr/pgmspace.h>
 #endif
+
 #include "pins_arduino.h"
 #include "wiring_private.h"
 #include <SPI.h>
@@ -49,7 +50,7 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
         return;
     }
 
-	#if !defined(NRF52_PRIMO_CORE) && !defined(NRF52_PRIMO)
+	#if !defined(ARDUINO_NRF52_PRIMO_CORE) && !defined(ARDUINO_NRF52_PRIMO)
 
     int8_t i;
     
@@ -77,23 +78,22 @@ inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
 
 
 void Adafruit_SSD1351::writeCommand(uint8_t c) {
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_rs, LOW);
 	#else
 	*rsport &= ~ rspinmask;
 	#endif
     
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_cs, LOW);
 	#else
 	*csport &= ~ cspinmask;
 	#endif
-    //digitalWrite(_cs, LOW);
     
     //Serial.print("C ");
     spiwrite(c);
     
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_cs, HIGH);
 	#else
 	*csport |= cspinmask;
@@ -102,13 +102,13 @@ void Adafruit_SSD1351::writeCommand(uint8_t c) {
 
 
 void Adafruit_SSD1351::writeData(uint8_t c) {
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
     digitalWrite(_rs, HIGH);
 	#else
     *rsport |= rspinmask;
     #endif
 	
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_cs, LOW);
 	#else
     *csport &= ~ cspinmask;
@@ -118,7 +118,7 @@ void Adafruit_SSD1351::writeData(uint8_t c) {
 //    Serial.print("D ");
     spiwrite(c);
     
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_cs, HIGH);
 	#else
     *csport |= cspinmask;
@@ -361,7 +361,7 @@ void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
   goTo(x, y);
   
   // setup for data
-#if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_cs, LOW);
 	digitalWrite(_rs, HIGH);
 	#else
@@ -372,7 +372,7 @@ void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
   spiwrite(color >> 8);    
   spiwrite(color);
   
-  #if defined(NRF52_PRIMO_CORE) || defined(NRF52_PRIMO)
+	#if defined(ARDUINO_NRF52_PRIMO_CORE) || defined(ARDUINO_NRF52_PRIMO)
 	digitalWrite(_cs, HIGH);
 	#else
 	*csport |= cspinmask;
@@ -488,7 +488,7 @@ void  Adafruit_SSD1351::invert(boolean v) {
  }
 
 /********************************* low level pin initialization */
-#if !defined(NRF52_PRIMO_CORE) && !defined(NRF52_PRIMO)
+#if !defined(ARDUINO_NRF52_PRIMO_CORE) && !defined(ARDUINO_NRF52_PRIMO)
 Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t sclk, uint8_t rst) : Adafruit_GFX(SSD1351WIDTH, SSD1351HEIGHT) {
     _cs = cs;
     _rs = rs;
@@ -517,7 +517,7 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafr
     _sid = 0;
     _sclk = 0;
     _rst = rst;
-#if !defined(NRF52_PRIMO_CORE) && !defined(NRF52_PRIMO)
+#if !defined(ARDUINO_NRF52_PRIMO_CORE) && !defined(ARDUINO_NRF52_PRIMO)
     csport      = portOutputRegister(digitalPinToPort(cs));
     cspinmask   = digitalPinToBitMask(cs);
     rsport      = portOutputRegister(digitalPinToPort(rs));
