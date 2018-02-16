@@ -226,7 +226,7 @@ void Adafruit_SSD1351::rawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t co
   // fill!
   writeCommand(SSD1351_CMD_WRITERAM);  
 
-  for (uint16_t i=0; i < w; i++) {
+  for (int16_t i=0; i < w; i++) {
     writeData(color >> 8);
     writeData(color);
   }
@@ -256,7 +256,7 @@ void Adafruit_SSD1351::rawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t co
   // fill!
   writeCommand(SSD1351_CMD_WRITERAM);  
 
-  for (uint16_t i=0; i < h; i++) {
+  for (int16_t i=0; i < h; i++) {
     writeData(color >> 8);
     writeData(color);
   }
