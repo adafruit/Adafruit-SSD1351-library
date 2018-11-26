@@ -36,17 +36,17 @@
 
 // TODO: this will be moved to SPITFT, but for now:
 #if defined (ARDUINO_ARCH_ARC32)
-  #define SPI_DEFAULT_FREQ 16000000
+  #define SPI_DEFAULT_FREQ 16000000 ///< ARC32 SPI default frequency
 #elif defined (__AVR__) || defined(TEENSYDUINO)
-  #define SPI_DEFAULT_FREQ 8000000
+  #define SPI_DEFAULT_FREQ 8000000 ///< AVR SPI default frequency
 #elif defined(ESP8266) || defined (ARDUINO_MAXIM)
-  #define SPI_DEFAULT_FREQ 16000000
+  #define SPI_DEFAULT_FREQ 16000000 ///< ESP8266 SPI default frequency
 #elif defined(ESP32)
-  #define SPI_DEFAULT_FREQ 24000000
+  #define SPI_DEFAULT_FREQ 24000000 ///< ESP32 SPI default frequency
 #elif defined(RASPI)
-  #define SPI_DEFAULT_FREQ 24000000
+  #define SPI_DEFAULT_FREQ 24000000 ///< RASPI SPI default frequency
 #else
-  #define SPI_DEFAULT_FREQ 24000000
+  #define SPI_DEFAULT_FREQ 24000000 ///< SPI default frequency
 #endif
 
 /*!
