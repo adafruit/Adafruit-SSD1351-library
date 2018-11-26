@@ -1,525 +1,349 @@
-/*************************************************** 
-  This is a library for the 1.5" & 1.27" 16-bit Color OLEDs 
-  with SSD1331 driver chip
-
-  Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/1431
-  ------> http://www.adafruit.com/products/1673
-
-  These displays use SPI to communicate, 4 or 5 pins are required to  
-  interface
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
-  BSD license, all text above must be included in any redistribution
- ****************************************************/
-
-
-#include "Adafruit_GFX.h"
-#include "Adafruit_SSD1351.h"
-#include "glcdfont.c"
-#ifdef __AVR
-  #include <avr/pgmspace.h>
-#elif defined(ESP8266)
-  #include <pgmspace.h>
-#endif
-#include "pins_arduino.h"
-#include "wiring_private.h"
-#include <SPI.h>
-
-#ifndef _BV
-    #define _BV(bit) (1<<(bit))
-#endif
-
-/********************************** low level pin interface */
-
-inline void Adafruit_SSD1351::spiwrite(uint8_t c) {
-    
-    //Serial.println(c, HEX);
-    
-    if (!_sid) {
-        SPI.transfer(c);
-	// might be able to make this even faster but
-	// a delay -is- required
-	delayMicroseconds(1);
-        return;
-    }
-    
-    int8_t i;
-    
-    *sclkport |= sclkpinmask;
-    
-    for (i=7; i>=0; i--) {
-        *sclkport &= ~sclkpinmask;
-        //SCLK_PORT &= ~_BV(SCLK);
-        
-        if (c & _BV(i)) {
-            *sidport |= sidpinmask;
-            //digitalWrite(_sid, HIGH);
-            //SID_PORT |= _BV(SID);
-        } else {
-            *sidport &= ~sidpinmask;
-            //digitalWrite(_sid, LOW);
-            //SID_PORT &= ~_BV(SID);
-        }
-        
-        *sclkport |= sclkpinmask;
-        //SCLK_PORT |= _BV(SCLK);
-    }
-}
-
-
-void Adafruit_SSD1351::writeCommand(uint8_t c) {
-    *rsport &= ~ rspinmask;
-    //digitalWrite(_rs, LOW);
-    
-    *csport &= ~ cspinmask;
-    //digitalWrite(_cs, LOW);
-    
-    //Serial.print("C ");
-    spiwrite(c);
-    
-    *csport |= cspinmask;
-    //digitalWrite(_cs, HIGH);
-}
-
-
-void Adafruit_SSD1351::writeData(uint8_t c) {
-    *rsport |= rspinmask;
-    //digitalWrite(_rs, HIGH);
-    
-    *csport &= ~ cspinmask;
-    //digitalWrite(_cs, LOW);
-    
-//    Serial.print("D ");
-    spiwrite(c);
-    
-    *csport |= cspinmask;
-    //digitalWrite(_cs, HIGH);
-} 
-
-/***********************************/
-
-void Adafruit_SSD1351::goTo(int x, int y) {
-  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT)) return;
-  
-  // set x and y coordinate
-  writeCommand(SSD1351_CMD_SETCOLUMN);
-  writeData(x);
-  writeData(SSD1351WIDTH-1);
-
-  writeCommand(SSD1351_CMD_SETROW);
-  writeData(y);
-  writeData(SSD1351HEIGHT-1);
-
-  writeCommand(SSD1351_CMD_WRITERAM);  
-}
-
-uint16_t Adafruit_SSD1351::Color565(uint8_t r, uint8_t g, uint8_t b) {
-  uint16_t c;
-  c = r >> 3;
-  c <<= 6;
-  c |= g >> 2;
-  c <<= 5;
-  c |= b >> 3;
-
-  return c;
-}
-
-void Adafruit_SSD1351::fillScreen(uint16_t fillcolor) {
-  fillRect(0, 0, SSD1351WIDTH, SSD1351HEIGHT, fillcolor);
-}
-
-// Draw a filled rectangle with no rotation.
-void Adafruit_SSD1351::rawFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor) {
-  // Bounds check
-  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
-    return;
-
-  // Y bounds check
-  if (y+h > SSD1351HEIGHT)
-  {
-    h = SSD1351HEIGHT - y - 1;
-  }
-
-  // X bounds check
-  if (x+w > SSD1351WIDTH)
-  {
-    w = SSD1351WIDTH - x - 1;
-  }
-  
-  /*
-  Serial.print(x); Serial.print(", ");
-  Serial.print(y); Serial.print(", ");
-  Serial.print(w); Serial.print(", ");
-  Serial.print(h); Serial.println(", ");
-*/
-
-  // set location
-  writeCommand(SSD1351_CMD_SETCOLUMN);
-  writeData(x);
-  writeData(x+w-1);
-  writeCommand(SSD1351_CMD_SETROW);
-  writeData(y);
-  writeData(y+h-1);
-  // fill!
-  writeCommand(SSD1351_CMD_WRITERAM);  
-
-  for (uint16_t i=0; i < w*h; i++) {
-    writeData(fillcolor >> 8);
-    writeData(fillcolor);
-  }
-}
-
-/**************************************************************************/
 /*!
-    @brief  Draws a filled rectangle using HW acceleration
+ * @file Adafruit_SSD1351.cpp
+ *
+ * @mainpage Arduino library for color OLEDs based on SSD1351 drivers.
+ *
+ * @section intro_sec Introduction
+ *
+ * This is documentation for Adafruit's SSD1351 library for color OLED
+ * displays: http://www.adafruit.com/category/98
+ *
+ * These displays use SPI to communicate. SPI requires 4 pins (MOSI, SCK,
+ * select, data/command) and optionally a reset pin. Hardware SPI or
+ * 'bitbang' software SPI are both supported.
+ *
+ * Adafruit invests time and resources providing this open source code,
+ * please support Adafruit and open-source hardware by purchasing
+ * products from Adafruit!
+ *
+ * @section dependencies Dependencies
+ *
+ * This library depends on <a href="https://github.com/adafruit/Adafruit-GFX-Library">
+ * Adafruit_GFX</a> being present on your system. Please make sure you have
+ * installed the latest version before using this library.
+ *
+ * @section author Author
+ *
+ * Written by Limor Fried/Ladyada for Adafruit Industries, with
+ * contributions from the open source community.
+ *
+ * @section license License
+ *
+ * BSD license, all text above must be included in any redistribution.
+ */
+
+#include "Adafruit_SSD1351.h"
+
+// TODO: this will be moved to SPITFT, but for now:
+#if defined (ARDUINO_ARCH_ARC32)
+  #define SPI_DEFAULT_FREQ 16000000
+#elif defined (__AVR__) || defined(TEENSYDUINO)
+  #define SPI_DEFAULT_FREQ 8000000
+#elif defined(ESP8266) || defined (ARDUINO_MAXIM)
+  #define SPI_DEFAULT_FREQ 16000000
+#elif defined(ESP32)
+  #define SPI_DEFAULT_FREQ 24000000
+#elif defined(RASPI)
+  #define SPI_DEFAULT_FREQ 24000000
+#else
+  #define SPI_DEFAULT_FREQ 24000000
+#endif
+
+/*!
+    @brief   Constructor for SSD1351 displays, using software (bitbang) SPI.
+    @param   width
+             Display width in pixels (usu. 128)
+    @param   height
+             Display height in pixels (usu. 128 or 96)
+    @param   cs_pin
+             Chip-select pin (using Arduino pin numbering) for sharing the
+             bus with other devices. Active low.
+    @param   dc_pin
+             Data/command pin (using Arduino pin numbering), selects whether
+             display is receiving commands (low) or data (high).
+    @param   mosi_pin
+             MOSI (master out, slave in) pin (using Arduino pin numbering).
+             This transfers serial data from microcontroller to display.
+    @param   sclk_pin
+             SCLK (serial clock) pin (using Arduino pin numbering).
+             This clocks each bit from MOSI.
+    @param   rst_pin
+             Reset pin (using Arduino pin numbering), or -1 if not used
+             (some displays might be wired to share the microcontroller's
+             reset pin).
+    @return  Adafruit_SSD1351 object.
+    @note    Call the object's begin() function before use.
 */
-/**************************************************************************/
-void Adafruit_SSD1351::fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t fillcolor) {
-  // Transform x and y based on current rotation.
-  switch (getRotation()) {
-  case 0:  // No rotation
-    rawFillRect(x, y, w, h, fillcolor);
-    break;
-  case 1:  // Rotated 90 degrees clockwise.
-    swap(x, y);
-    x = WIDTH - x - h;
-    rawFillRect(x, y, h, w, fillcolor);
-    break;
-  case 2:  // Rotated 180 degrees clockwise.
-    x = WIDTH - x - w;
-    y = HEIGHT - y - h;
-    rawFillRect(x, y, w, h, fillcolor);
-    break;
-  case 3:  // Rotated 270 degrees clockwise.
-    swap(x, y);
-    y = HEIGHT - y - w;
-    rawFillRect(x, y, h, w, fillcolor);
-    break;
+Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
+  uint8_t cs_pin, uint8_t dc_pin, uint8_t mosi_pin, uint8_t sclk_pin,
+  uint8_t rst_pin) : Adafruit_SPITFT(width, height, cs_pin, dc_pin,
+  mosi_pin, sclk_pin, rst_pin, -1) {
+}
+
+/*!
+    @brief   Constructor for SSD1351 displays, using native hardware SPI.
+    @param   width
+             Display width in pixels
+    @param   height
+             Display height in pixels
+    @param   spi
+             Pointer to an existing SPIClass instance (e.g. &SPI, the
+             microcontroller's primary SPI bus).
+    @param   cs_pin
+             Chip-select pin (using Arduino pin numbering) for sharing the
+             bus with other devices. Active low.
+    @param   dc_pin
+             Data/command pin (using Arduino pin numbering), selects whether
+             display is receiving commands (low) or data (high).
+    @param   rst_pin
+             Reset pin (using Arduino pin numbering), or -1 if not used
+             (some displays might be wired to share the microcontroller's
+             reset pin).
+    @return  Adafruit_SSD1351 object.
+    @note    Call the object's begin() function before use.
+*/
+Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
+  SPIClass *spi, uint8_t cs_pin, uint8_t dc_pin, uint8_t rst_pin) :
+  Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin) {
+}
+
+/*!
+    @brief   DEPRECATED constructor for SSD1351 displays, using software
+             (bitbang) SPI. Provided for older code to maintain
+             compatibility with the current library. Screen size is
+             determined by editing the SSD1351WIDTH and SSD1351HEIGHT
+             defines in Adafruit_SSD1351.h.  New code should NOT use this.
+    @param   cs_pin
+             Chip-select pin (using Arduino pin numbering) for sharing the
+             bus with other devices. Active low.
+    @param   dc_pin
+             Data/command pin (using Arduino pin numbering), selects whether
+             display is receiving commands (low) or data (high).
+    @param   mosi_pin
+             MOSI (master out, slave in) pin (using Arduino pin numbering).
+             This transfers serial data from microcontroller to display.
+    @param   sclk_pin
+             SCLK (serial clock) pin (using Arduino pin numbering).
+             This clocks each bit from MOSI.
+    @param   rst_pin
+             Reset pin (using Arduino pin numbering), or -1 if not used
+             (some displays might be wired to share the microcontroller's
+             reset pin).
+    @return  Adafruit_SSD1351 object.
+    @note    Call the object's begin() function before use.
+*/
+Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs_pin, uint8_t dc_pin,
+  uint8_t mosi_pin, uint8_t sclk_pin, uint8_t rst_pin) :
+  Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, mosi_pin,
+  sclk_pin, rst_pin, -1) {
+}
+
+/*!
+    @brief   DEPRECATED constructor for SSD1351 displays, using native
+             hardware SPI. Provided for older code to maintain
+             compatibility with the current library. Screen size is
+             determined by editing the SSD1351WIDTH and SSD1351HEIGHT
+             defines in Adafruit_SSD1351.h. Only the primary SPI bus is
+             supported, and bitrate is fixed at a default. New code should
+             NOT use this.
+    @param   cs_pin
+             Chip-select pin (using Arduino pin numbering) for sharing the
+             bus with other devices. Active low.
+    @param   dc_pin
+             Data/command pin (using Arduino pin numbering), selects whether
+             display is receiving commands (low) or data (high).
+    @param   rst_pin
+             Reset pin (using Arduino pin numbering), or -1 if not used
+             (some displays might be wired to share the microcontroller's
+             reset pin).
+    @return  Adafruit_SSD1351 object.
+    @note    Call the object's begin() function before use.
+*/
+Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs_pin, uint8_t dc_pin,
+  uint8_t rst_pin) : Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, &SPI,
+  cs_pin, dc_pin, rst_pin) {
+}
+
+/*!
+    @brief  Destructor for Adafruit_SSD1351 object.
+*/
+Adafruit_SSD1351::~Adafruit_SSD1351(void) {
+}
+
+// INIT DISPLAY ------------------------------------------------------------
+
+static const uint8_t PROGMEM initList[] = {
+  SSD1351_CMD_COMMANDLOCK, 1, // Set command lock, 1 arg
+    0x12,
+  SSD1351_CMD_COMMANDLOCK, 1, // Set command lock, 1 arg
+    0xB1,
+  SSD1351_CMD_DISPLAYOFF, 0,  // Display off, no args
+  SSD1351_CMD_CLOCKDIV, 1,
+    0xF1, // 7:4 = Oscillator Freq, 3:0 = CLK Div Ratio (A[3:0]+1 = 1..16)
+  SSD1351_CMD_MUXRATIO, 1,
+    127,
+  SSD1351_CMD_DISPLAYOFFSET, 1,
+    0x0,
+  SSD1351_CMD_SETGPIO, 1,
+    0x00,
+  SSD1351_CMD_FUNCTIONSELECT, 1,
+    0x01,  // internal (diode drop)
+  SSD1351_CMD_PRECHARGE, 1,
+    0x32,
+  SSD1351_CMD_VCOMH, 1,
+    0x05,
+  SSD1351_CMD_NORMALDISPLAY, 0,
+  SSD1351_CMD_CONTRASTABC, 3,
+    0xC8, 0x80, 0xC8,
+  SSD1351_CMD_CONTRASTMASTER, 1,
+    0x0F,
+  SSD1351_CMD_SETVSL, 3,
+    0xA0, 0xB5, 0x55,
+  SSD1351_CMD_PRECHARGE2, 1,
+    0x01,
+  SSD1351_CMD_DISPLAYON, 0, // Main screen turn on
+  0 }; // END OF COMMAND LIST
+
+/*!
+    @brief   Initialize SSD1351 chip. Configures pins, connects to the
+             SSD1351 and sends initialization commands.
+    @param   freq
+             SPI bitrate -- default of 0 will use a (usually) platform-
+             optimized value, e.g. 8 MHz on AVR, 12 MHz on M0.
+    @return  None (void).
+*/
+void Adafruit_SSD1351::begin(uint32_t freq) {
+
+  if(!freq) freq = SPI_DEFAULT_FREQ; // Will move to SPITFT initSPI
+  initSPI(freq);
+
+  startWrite();
+  const uint8_t *addr = (const uint8_t *)initList;
+  uint8_t        cmd, x, numArgs;
+  while((cmd = pgm_read_byte(addr++)) > 0) { // '0' command ends list
+    if(cmd != 0xFF) writeCommand(cmd);       // '255' is ignored
+    x       = pgm_read_byte(addr++);
+    numArgs = x & 0x7F;
+    while(numArgs--) spiWrite(pgm_read_byte(addr++));
   }
+  endWrite();
+  setRotation(0);
 }
 
-// Draw a horizontal line ignoring any screen rotation.
-void Adafruit_SSD1351::rawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
-  // Bounds check
-  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
-    return;
+// GFX FUNCTIONS -----------------------------------------------------------
 
-  // X bounds check
-  if (x+w > SSD1351WIDTH)
-  {
-    w = SSD1351WIDTH - x - 1;
+/*!
+    @brief   Set origin of (0,0) and orientation of OLED display
+    @param   r
+             The index for rotation, from 0-3 inclusive
+    @return  None (void).
+    @note    SSD1351 works differently than most (all?) other SPITFT
+             displays. With certain rotation changes the screen contents
+             may change immediately into a peculiar format (mirrored, not
+             necessarily rotated) (other displays, this only affects new
+             drawing -- rotation combinations can apply to different
+             areas). Therefore, it's recommend to clear the screen
+             (fillScreen(0)) before changing rotation.
+*/
+void Adafruit_SSD1351::setRotation(uint8_t r) {
+  // madctl bits:
+  // 6,7 Color depth (01 = 64K)
+  // 5   Odd/even split COM (0: disable, 1: enable)
+  // 4   Scan direction (0: top-down, 1: bottom-up)
+  // 3   Reserved
+  // 2   Color remap (0: A->B->C, 1: C->B->A)
+  // 1   Column remap (0: 0-127, 1: 127-0)
+  // 0   Address increment (0: horizontal, 1: vertical)
+  uint8_t madctl = 0b01100100; // 64K, enable split, CBA
+
+  rotation = r & 3; // Clip input to valid range
+
+  switch(rotation) {
+    case 0:
+      madctl |= 0b00010000; // Scan bottom-up
+      _width  = WIDTH;
+      _height = HEIGHT;
+      break;
+    case 1:
+      madctl |= 0b00010011; // Scan bottom-up, column remap 127-0, vertical
+      _width  = HEIGHT;
+      _height = WIDTH;
+      break;
+    case 2:
+      madctl |= 0b00000010; // Column remap 127-0
+      _width  = WIDTH;
+      _height = HEIGHT;
+      break;
+    case 3:
+      madctl |= 0b00000001; // Vertical
+      _width  = HEIGHT;
+      _height = WIDTH;
+      break;
   }
+  startWrite();
+  writeCommand(SSD1351_CMD_SETREMAP);
+  spiWrite(madctl);
+  writeCommand(SSD1351_CMD_STARTLINE);
+  spiWrite((rotation < 2) ? HEIGHT : 0);
+  endWrite();
+}
 
-  if (w < 0) return;
+/*!
+    @brief   Enable/Disable display color inversion
+    @param   i
+             True to invert display, False for normal color.
+    @return  None (void).
+    @note    This syntax is used by other SPITFT compatible libraries.
+             New code should use this.
+*/
+void Adafruit_SSD1351::invertDisplay(boolean i) {
+  startWrite();
+  writeCommand(i ? SSD1351_CMD_INVERTDISPLAY : SSD1351_CMD_NORMALDISPLAY);
+  endWrite();
+}
 
-  // set location
-  writeCommand(SSD1351_CMD_SETCOLUMN);
-  writeData(x);
-  writeData(x+w-1);
-  writeCommand(SSD1351_CMD_SETROW);
-  writeData(y);
-  writeData(y);
-  // fill!
-  writeCommand(SSD1351_CMD_WRITERAM);  
+/*!
+    @brief   Enable/Disable display color inversion
+    @param   i
+             True to invert display, False for normal color.
+    @return  None (void).
+    @note    This is an older syntax used by this library prior to the
+             SPITFT library. New code should avoid it.
+*/
+void Adafruit_SSD1351::invert(boolean i) {
+  invertDisplay(i);
+}
 
-  for (uint16_t i=0; i < w; i++) {
-    writeData(color >> 8);
-    writeData(color);
+#define ssd1351_swap(a, b) \
+  (((a) ^= (b)), ((b) ^= (a)), ((a) ^= (b))) ///< No-temp-var swap operation
+
+/*!
+    @brief   Set the "address window" - the rectangle we will write to
+             graphics RAM with the next chunk of SPI data writes. The
+             SSD1351 will automatically wrap the data as each row is filled.
+    @param   x1
+             Leftmost column of rectangle (screen pixel coordinates).
+    @param   y1
+             Topmost row of rectangle (screen pixel coordinates).
+    @param   w
+             Width of rectangle.
+    @param   h
+             Height of rectangle.
+    @return  None (void).
+*/
+void Adafruit_SSD1351::setAddrWindow(
+  uint16_t x1, uint16_t y1, uint16_t w, uint16_t h) {
+  uint16_t x2 = x1 + w - 1,
+           y2 = y1 + h - 1;
+  if(rotation & 1) { // Vertical address increment mode
+    ssd1351_swap(x1, y1);
+    ssd1351_swap(x2, y2);
   }
+  writeCommand(SSD1351_CMD_SETCOLUMN); // X range
+  spiWrite(x1);
+  spiWrite(x2);
+  writeCommand(SSD1351_CMD_SETROW);    // Y range
+  spiWrite(y1);
+  spiWrite(y2);
+  writeCommand(SSD1351_CMD_WRITERAM);  // Begin write
 }
-
-// Draw a vertical line ignoring any screen rotation.
-void Adafruit_SSD1351::rawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
-  // Bounds check
-  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT))
-  return;
-
-  // X bounds check
-  if (y+h > SSD1351HEIGHT)
-  {
-    h = SSD1351HEIGHT - y - 1;
-  }
-
-  if (h < 0) return;
-
-  // set location
-  writeCommand(SSD1351_CMD_SETCOLUMN);
-  writeData(x);
-  writeData(x);
-  writeCommand(SSD1351_CMD_SETROW);
-  writeData(y);
-  writeData(y+h-1);
-  // fill!
-  writeCommand(SSD1351_CMD_WRITERAM);  
-
-  for (uint16_t i=0; i < h; i++) {
-    writeData(color >> 8);
-    writeData(color);
-  }
-}
-
-void Adafruit_SSD1351::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
-  // Transform x and y based on current rotation.
-  switch (getRotation()) {
-  case 0:  // No rotation
-    rawFastVLine(x, y, h, color);
-    break;
-  case 1:  // Rotated 90 degrees clockwise.
-    swap(x, y);
-    x = WIDTH - x - h;
-    rawFastHLine(x, y, h, color);
-    break;
-  case 2:  // Rotated 180 degrees clockwise.
-    x = WIDTH - x - 1;
-    y = HEIGHT - y - h;
-    rawFastVLine(x, y, h, color);
-    break;
-  case 3:  // Rotated 270 degrees clockwise.
-    swap(x, y);
-    y = HEIGHT - y - 1;
-    rawFastHLine(x, y, h, color);
-    break;
-  }
-}
-
-void Adafruit_SSD1351::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
-  // Transform x and y based on current rotation.
-  switch (getRotation()) {
-  case 0:  // No rotation.
-    rawFastHLine(x, y, w, color);
-    break;
-  case 1:  // Rotated 90 degrees clockwise.
-    swap(x, y);
-    x = WIDTH - x - 1;
-    rawFastVLine(x, y, w, color);
-    break;
-  case 2:  // Rotated 180 degrees clockwise.
-    x = WIDTH - x - w;
-    y = HEIGHT - y - 1;
-    rawFastHLine(x, y, w, color);
-    break;
-  case 3:  // Rotated 270 degrees clockwise.
-    swap(x, y);
-    y = HEIGHT - y - w;
-    rawFastVLine(x, y, w, color);
-    break;
-  }
-}
-
-void Adafruit_SSD1351::drawPixel(int16_t x, int16_t y, uint16_t color)
-{
-  // Transform x and y based on current rotation.
-  switch (getRotation()) {
-  // Case 0: No rotation
-  case 1:  // Rotated 90 degrees clockwise.
-    swap(x, y);
-    x = WIDTH - x - 1;
-    break;
-  case 2:  // Rotated 180 degrees clockwise.
-    x = WIDTH - x - 1;
-    y = HEIGHT - y - 1;
-    break;
-  case 3:  // Rotated 270 degrees clockwise.
-    swap(x, y);
-    y = HEIGHT - y - 1;
-    break;
-  }
-
-  // Bounds check.
-  if ((x >= SSD1351WIDTH) || (y >= SSD1351HEIGHT)) return;
-  if ((x < 0) || (y < 0)) return;
-
-  goTo(x, y);
-  
-  // setup for data
-  *rsport |= rspinmask;
-  *csport &= ~ cspinmask;
-  
-  spiwrite(color >> 8);    
-  spiwrite(color);
-  
-  *csport |= cspinmask;
-}
-
-void Adafruit_SSD1351::begin(void) {
-    // set pin directions
-    pinMode(_rs, OUTPUT);
-    
-    if (_sclk) {
-        pinMode(_sclk, OUTPUT);
-        
-        pinMode(_sid, OUTPUT);
-    } else {
-        // using the hardware SPI
-        SPI.begin();
-        SPI.setDataMode(SPI_MODE3);
-    }
-	
-    // Toggle RST low to reset; CS low so it'll listen to us
-    pinMode(_cs, OUTPUT);
-    digitalWrite(_cs, LOW);
-    
-    if (_rst) {
-        pinMode(_rst, OUTPUT);
-        digitalWrite(_rst, HIGH);
-        delay(500);
-        digitalWrite(_rst, LOW);
-        delay(500);
-        digitalWrite(_rst, HIGH);
-        delay(500);
-    }
-
-    // Initialization Sequence
-    writeCommand(SSD1351_CMD_COMMANDLOCK);  // set command lock
-    writeData(0x12);  
-    writeCommand(SSD1351_CMD_COMMANDLOCK);  // set command lock
-    writeData(0xB1);
-
-    writeCommand(SSD1351_CMD_DISPLAYOFF);  		// 0xAE
-
-    writeCommand(SSD1351_CMD_CLOCKDIV);  		// 0xB3
-    writeCommand(0xF1);  						// 7:4 = Oscillator Frequency, 3:0 = CLK Div Ratio (A[3:0]+1 = 1..16)
-    
-    writeCommand(SSD1351_CMD_MUXRATIO);
-    writeData(127);
-    
-    writeCommand(SSD1351_CMD_SETREMAP);
-    writeData(0x74);
-  
-    writeCommand(SSD1351_CMD_SETCOLUMN);
-    writeData(0x00);
-    writeData(0x7F);
-    writeCommand(SSD1351_CMD_SETROW);
-    writeData(0x00);
-    writeData(0x7F);
-
-    writeCommand(SSD1351_CMD_STARTLINE); 		// 0xA1
-    if (SSD1351HEIGHT == 96) {
-      writeData(96);
-    } else {
-      writeData(0);
-    }
-
-
-    writeCommand(SSD1351_CMD_DISPLAYOFFSET); 	// 0xA2
-    writeData(0x0);
-
-    writeCommand(SSD1351_CMD_SETGPIO);
-    writeData(0x00);
-    
-    writeCommand(SSD1351_CMD_FUNCTIONSELECT);
-    writeData(0x01); // internal (diode drop)
-    //writeData(0x01); // external bias
-
-//    writeCommand(SSSD1351_CMD_SETPHASELENGTH);
-//    writeData(0x32);
-
-    writeCommand(SSD1351_CMD_PRECHARGE);  		// 0xB1
-    writeCommand(0x32);
- 
-    writeCommand(SSD1351_CMD_VCOMH);  			// 0xBE
-    writeCommand(0x05);
-
-    writeCommand(SSD1351_CMD_NORMALDISPLAY);  	// 0xA6
-
-    writeCommand(SSD1351_CMD_CONTRASTABC);
-    writeData(0xC8);
-    writeData(0x80);
-    writeData(0xC8);
-
-    writeCommand(SSD1351_CMD_CONTRASTMASTER);
-    writeData(0x0F);
-
-    writeCommand(SSD1351_CMD_SETVSL );
-    writeData(0xA0);
-    writeData(0xB5);
-    writeData(0x55);
-    
-    writeCommand(SSD1351_CMD_PRECHARGE2);
-    writeData(0x01);
-    
-    writeCommand(SSD1351_CMD_DISPLAYON);		//--turn on oled panel    
-}
-
-void  Adafruit_SSD1351::invert(boolean v) {
-   if (v) {
-     writeCommand(SSD1351_CMD_INVERTDISPLAY);
-   } else {
-     	writeCommand(SSD1351_CMD_NORMALDISPLAY);
-   }
- }
-
-/********************************* low level pin initialization */
-
-Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t sclk, uint8_t rst) : Adafruit_GFX(SSD1351WIDTH, SSD1351HEIGHT) {
-    _cs = cs;
-    _rs = rs;
-    _sid = sid;
-    _sclk = sclk;
-    _rst = rst;
-    
-    csport      = portOutputRegister(digitalPinToPort(cs));
-    cspinmask   = digitalPinToBitMask(cs);
-
-    rsport      = portOutputRegister(digitalPinToPort(rs));
-    rspinmask   = digitalPinToBitMask(rs);
-
-    sidport      = portOutputRegister(digitalPinToPort(sid));
-    sidpinmask   = digitalPinToBitMask(sid);
-
-    sclkport      = portOutputRegister(digitalPinToPort(sclk));
-    sclkpinmask   = digitalPinToBitMask(sclk);
-
-}
-
-Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs, uint8_t rs,  uint8_t rst) : Adafruit_GFX(SSD1351WIDTH, SSD1351HEIGHT) {
-    _cs = cs;
-    _rs = rs;
-    _sid = 0;
-    _sclk = 0;
-    _rst = rst;
-
-    csport      = portOutputRegister(digitalPinToPort(cs));
-    cspinmask   = digitalPinToBitMask(cs);
-    
-    rsport      = portOutputRegister(digitalPinToPort(rs));
-    rspinmask   = digitalPinToBitMask(rs);
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
