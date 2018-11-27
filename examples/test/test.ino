@@ -315,7 +315,7 @@ void mediabuttons() {
 /**************************************************************************/
 void lcdTestPattern(void)
 {
-  const uint16_t PROGMEM colors[] =
+  static const uint16_t PROGMEM colors[] =
     { RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA, BLACK, WHITE };
 
   for(uint8_t c=0; c<8; c++) {
