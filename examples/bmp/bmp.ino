@@ -171,7 +171,7 @@ void bmpDraw(char *filename, uint8_t x, uint8_t y) {
         if((y+h-1) >= tft.height()) h = tft.height() - y;
 
         for (row=0; row<h; row++) { // For each scanline...
-          tft.goTo(x, y+row);
+          // tft.goTo(x, y+row);
 
           // Seek to start of scan line.  It might seem labor-
           // intensive to be doing this on every line, but this
@@ -201,9 +201,9 @@ void bmpDraw(char *filename, uint8_t x, uint8_t y) {
             g = sdbuffer[buffidx++];
             r = sdbuffer[buffidx++];
 
-            tft.drawPixel(x+col, y+row, tft.Color565(r,g,b));
+            tft.drawPixel(x+col, y+row, tft.color565(r,g,b));
             // optimized!
-            //tft.pushColor(tft.Color565(r,g,b));
+            //tft.pushColor(tft.color565(r,g,b));
           } // end pixel
         } // end scanline
         Serial.print("Loaded in ");
