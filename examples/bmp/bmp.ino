@@ -35,11 +35,11 @@
 
 
 // If we are using the hardware SPI interface, these are the pins (for future ref)
-#define sclk 13
-#define mosi 11
-#define cs   5
-#define rst  6
-#define dc   4
+#define SCLK_PIN 13
+#define MOSI_PIN 11
+#define CS_PIN   5
+#define RST_PIN  6
+#define DC_PIN   4
 
 // Color definitions
 #define	BLACK           0x0000
@@ -52,7 +52,7 @@
 #define WHITE           0xFFFF
 
 // to draw images from the SD card, we will share the hardware SPI interface
-Adafruit_SSD1351 tft = Adafruit_SSD1351(cs, dc, rst);
+Adafruit_SSD1351 tft = Adafruit_SSD1351(CS_PIN, DC_PIN, RST_PIN);
 
 // For Arduino Uno/Duemilanove, etc
 //  connect the SD card with MOSI going to pin 11, MISO going to pin 12 and SCK going to pin 13 (standard)
@@ -70,8 +70,8 @@ uint8_t bmpDepth, bmpImageoffset;
 void setup(void) {
   Serial.begin(9600);
    
-  pinMode(cs, OUTPUT);
-  digitalWrite(cs, HIGH);
+  pinMode(CS_PIN, OUTPUT);
+  digitalWrite(CS_PIN, HIGH);
      
   // initialize the OLED
   tft.begin();
