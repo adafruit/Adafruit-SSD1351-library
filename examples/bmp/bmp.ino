@@ -1,3 +1,7 @@
+// IMPORTANT: this code temporarily DOES NOT WORK.
+// New BMP-loading examples will be provided soon
+// in the Adafruit_ImageReader library!
+
 /*************************************************** 
   This is a example sketch demonstrating bitmap drawing
   capabilities of the SSD1351 library for the 1.5" 
