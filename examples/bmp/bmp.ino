@@ -2,25 +2,25 @@
 // New BMP-loading examples will be provided soon
 // in the Adafruit_ImageReader library!
 
-/*************************************************** 
+/***************************************************
   This is a example sketch demonstrating bitmap drawing
-  capabilities of the SSD1351 library for the 1.5" 
+  capabilities of the SSD1351 library for the 1.5"
   and 1.27" 16-bit Color OLEDs with SSD1351 driver chip
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1431
   ------> http://www.adafruit.com/products/1673
- 
+
   If you're using a 1.27" OLED, change SSD1351HEIGHT in Adafruit_SSD1351.h
  	to 96 instead of 128
 
-  These displays use SPI to communicate, 4 or 5 pins are required to  
+  These displays use SPI to communicate, 4 or 5 pins are required to
   interface
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  Written by Limor Fried/Ladyada for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
 
   The Adafruit GFX Graphics core library is also required
@@ -33,6 +33,9 @@
 #include <SD.h>
 #include <SPI.h>
 
+// Screen dimensions
+#define SCREEN_WIDTH  128
+#define SCREEN_HEIGHT 128
 
 // If we are using the hardware SPI interface, these are the pins (for future ref)
 #define SCLK_PIN 13
@@ -48,11 +51,15 @@
 #define	GREEN           0x07E0
 #define CYAN            0x07FF
 #define MAGENTA         0xF81F
-#define YELLOW          0xFFE0  
+#define YELLOW          0xFFE0
 #define WHITE           0xFFFF
 
 // to draw images from the SD card, we will share the hardware SPI interface
-Adafruit_SSD1351 tft = Adafruit_SSD1351(CS_PIN, DC_PIN, RST_PIN);
+#if !defined(ESP8266)
+  Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, CS_PIN, DC_PIN, RST_PIN);
+#else
+  Adafruit_SSD1351 tft = Adafruit_SSD1351(SCREEN_WIDTH, SCREEN_HEIGHT, CS_PIN, DC_PIN, MOSI_PIN, SCLK_PIN, RST_PIN);
+#endif
 
 // For Arduino Uno/Duemilanove, etc
 //  connect the SD card with MOSI going to pin 11, MISO going to pin 12 and SCK going to pin 13 (standard)
@@ -69,17 +76,17 @@ uint8_t bmpDepth, bmpImageoffset;
 
 void setup(void) {
   Serial.begin(9600);
-   
+
   pinMode(CS_PIN, OUTPUT);
   digitalWrite(CS_PIN, HIGH);
-     
+
   // initialize the OLED
   tft.begin();
 
   Serial.println("init");
-  
+
   tft.fillScreen(BLUE);
-  
+
   delay(500);
   Serial.print("Initializing SD card...");
 
