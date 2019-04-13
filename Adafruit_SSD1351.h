@@ -97,8 +97,10 @@ class Adafruit_SSD1351 : public Adafruit_SPITFT {
     void begin(uint32_t freq = 0),
          setRotation(uint8_t r),
          invertDisplay(boolean i), // Preferred syntax (same as other screens)
-         invert(boolean i),        // For compatibility with old code
-         setAddrWindow(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
+         invert(boolean i);        // For compatibility with old code
+  
+  protected:
+    void setAddrWindow(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 };
 
 #endif // _Adafruit_SSD1351_H_
