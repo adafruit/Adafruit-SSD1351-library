@@ -75,11 +75,11 @@
     @note    Call the object's begin() function before use.
 */
 Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
-  uint8_t cs_pin, uint8_t dc_pin, uint8_t mosi_pin, uint8_t sclk_pin,
-  uint8_t rst_pin) : Adafruit_SPITFT(width, height, cs_pin, dc_pin,
+  int8_t cs_pin, int8_t dc_pin, int8_t mosi_pin, int8_t sclk_pin,
+  int8_t rst_pin) : Adafruit_SPITFT(width, height, cs_pin, dc_pin,
   mosi_pin, sclk_pin, rst_pin, -1) {
 }
-#if !defined(ESP8266)
+
 /*!
     @brief   Constructor for SSD1351 displays, using native hardware SPI.
     @param   width
@@ -104,10 +104,14 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
 */
 
 Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
-  SPIClass *spi, uint8_t cs_pin, uint8_t dc_pin, uint8_t rst_pin) :
+  SPIClass *spi, int8_t cs_pin, int8_t dc_pin, int8_t rst_pin) :
+#if defined(ESP8266)
+  Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
+#else
   Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin) {
-}
 #endif
+}
+
 /*!
     @brief   DEPRECATED constructor for SSD1351 displays, using software
              (bitbang) SPI. Provided for older code to maintain
@@ -133,12 +137,12 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
     @return  Adafruit_SSD1351 object.
     @note    Call the object's begin() function before use.
 */
-Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs_pin, uint8_t dc_pin,
-  uint8_t mosi_pin, uint8_t sclk_pin, uint8_t rst_pin) :
+Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin,
+  int8_t mosi_pin, int8_t sclk_pin, int8_t rst_pin) :
   Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, mosi_pin,
   sclk_pin, rst_pin, -1) {
 }
-#if !defined(ESP8266)
+
 /*!
     @brief   DEPRECATED constructor for SSD1351 displays, using native
              hardware SPI. Provided for older code to maintain
@@ -160,11 +164,13 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs_pin, uint8_t dc_pin,
     @return  Adafruit_SSD1351 object.
     @note    Call the object's begin() function before use.
 */
-Adafruit_SSD1351::Adafruit_SSD1351(uint8_t cs_pin, uint8_t dc_pin,
-  uint8_t rst_pin) : Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, &SPI,
-  cs_pin, dc_pin, rst_pin) {
-}
+Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin, int8_t rst_pin) :
+#if defined(ESP8266)
+  Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, rst_pin)
+#else
+  Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, &SPI, cs_pin, dc_pin, rst_pin) 
 #endif
+{ }
 
 /*!
     @brief  Destructor for Adafruit_SSD1351 object.
@@ -219,16 +225,18 @@ void Adafruit_SSD1351::begin(uint32_t freq) {
   if(!freq) freq = SPI_DEFAULT_FREQ; // Will move to SPITFT initSPI
   initSPI(freq);
 
-  startWrite();
   const uint8_t *addr = (const uint8_t *)initList;
   uint8_t        cmd, x, numArgs;
   while((cmd = pgm_read_byte(addr++)) > 0) { // '0' command ends list
+    startWrite();
     if(cmd != 0xFF) writeCommand(cmd);       // '255' is ignored
     x       = pgm_read_byte(addr++);
     numArgs = x & 0x7F;
-    while(numArgs--) spiWrite(pgm_read_byte(addr++));
-  }
+    while(numArgs--) {
+      spiWrite(pgm_read_byte(addr++));
+    }
   endWrite();
+  }
   setRotation(0);
 }
 
