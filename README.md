@@ -1,4 +1,4 @@
-# Adafruit SSD1351 Arduino Library [![Build Status](https://travis-ci.org/adafruit/Adafruit-SSD1351-library.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit-SSD1351-library)
+# Adafruit SSD1351 Arduino Library [![Build Status](https://travis-ci.com/adafruit/Adafruit-SSD1351-library.svg?branch=master)](https://travis-ci.com/adafruit/Adafruit-SSD1351-library)
 
 This is a library for the Adafruit SSD1351 OLED display products:
 
