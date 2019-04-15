@@ -227,15 +227,14 @@ void Adafruit_SSD1351::begin(uint32_t freq) {
 
   const uint8_t *addr = (const uint8_t *)initList;
   uint8_t        cmd, x, numArgs;
+
   while((cmd = pgm_read_byte(addr++)) > 0) { // '0' command ends list
-    startWrite();
-    if(cmd != 0xFF) writeCommand(cmd);       // '255' is ignored
-    x       = pgm_read_byte(addr++);
+    x = pgm_read_byte(addr++);
     numArgs = x & 0x7F;
-    while(numArgs--) {
-      spiWrite(pgm_read_byte(addr++));
+    if (cmd != 0xFF) { // '255' is ignored
+      sendCommand(cmd, addr, numArgs);
     }
-  endWrite();
+    addr += numArgs;
   }
   setRotation(0);
 }
@@ -290,12 +289,10 @@ void Adafruit_SSD1351::setRotation(uint8_t r) {
       _height = WIDTH;
       break;
   }
-  startWrite();
-  writeCommand(SSD1351_CMD_SETREMAP);
-  spiWrite(madctl);
-  writeCommand(SSD1351_CMD_STARTLINE);
-  spiWrite((rotation < 2) ? HEIGHT : 0);
-  endWrite();
+
+  sendCommand(SSD1351_CMD_SETREMAP, &madctl, 1);
+  uint8_t startline = (rotation < 2) ? HEIGHT : 0;
+  sendCommand(SSD1351_CMD_STARTLINE, &startline, 1);
 }
 
 /*!
@@ -307,9 +304,7 @@ void Adafruit_SSD1351::setRotation(uint8_t r) {
              New code should use this.
 */
 void Adafruit_SSD1351::invertDisplay(boolean i) {
-  startWrite();
-  writeCommand(i ? SSD1351_CMD_INVERTDISPLAY : SSD1351_CMD_NORMALDISPLAY);
-  endWrite();
+  sendCommand(i ? SSD1351_CMD_INVERTDISPLAY : SSD1351_CMD_NORMALDISPLAY);
 }
 
 /*!
@@ -343,6 +338,7 @@ void Adafruit_SSD1351::invert(boolean i) {
 */
 void Adafruit_SSD1351::setAddrWindow(
   uint16_t x1, uint16_t y1, uint16_t w, uint16_t h) {
+
   uint16_t x2 = x1 + w - 1,
            y2 = y1 + h - 1;
   if(rotation & 1) { // Vertical address increment mode
