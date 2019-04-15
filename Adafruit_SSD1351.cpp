@@ -339,7 +339,6 @@ void Adafruit_SSD1351::invert(boolean i) {
 void Adafruit_SSD1351::setAddrWindow(
   uint16_t x1, uint16_t y1, uint16_t w, uint16_t h) {
 
-  uint16_t data[2];
   uint16_t x2 = x1 + w - 1,
            y2 = y1 + h - 1;
   if(rotation & 1) { // Vertical address increment mode
