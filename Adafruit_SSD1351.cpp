@@ -353,3 +353,13 @@ void Adafruit_SSD1351::setAddrWindow(
   spiWrite(y2);
   writeCommand(SSD1351_CMD_WRITERAM);  // Begin write
 }
+
+/**************************************************************************/
+/*!
+ @brief  Change whether display is on or off
+ @param   enable True if you want the display ON, false OFF
+ */
+/**************************************************************************/
+void Adafruit_SSD1351::enableDisplay(boolean enable) {
+  sendCommand(enable ? SSD1351_CMD_DISPLAYON : SSD1351_CMD_DISPLAYOFF);
+}
