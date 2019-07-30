@@ -109,6 +109,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a151bae95fd4af73eff902a03b117f890"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___s_s_d1351.html#a151bae95fd4af73eff902a03b117f890">invert</a> (boolean i)</td></tr>
 <tr class="memdesc:a151bae95fd4af73eff902a03b117f890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable/Disable display color inversion.  <a href="#a151bae95fd4af73eff902a03b117f890">More...</a><br /></td></tr>
 <tr class="separator:a151bae95fd4af73eff902a03b117f890"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6c6ab994b9f02464994af1378342ee5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___s_s_d1351.html#ab6c6ab994b9f02464994af1378342ee5">enableDisplay</a> (boolean enable)</td></tr>
+<tr class="memdesc:ab6c6ab994b9f02464994af1378342ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change whether display is on or off.  <a href="#ab6c6ab994b9f02464994af1378342ee5">More...</a><br /></td></tr>
+<tr class="separator:ab6c6ab994b9f02464994af1378342ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80a1e1da901f2f60906ef4ba7f8663f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___s_s_d1351.html#a80a1e1da901f2f60906ef4ba7f8663f8">setAddrWindow</a> (uint16_t x, uint16_t y, uint16_t w, uint16_t h)</td></tr>
 <tr class="memdesc:a80a1e1da901f2f60906ef4ba7f8663f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the "address window" - the rectangle we will write to graphics RAM with the next chunk of SPI data writes. The SSD1351 will automatically wrap the data as each row is filled.  <a href="#a80a1e1da901f2f60906ef4ba7f8663f8">More...</a><br /></td></tr>
 <tr class="separator:a80a1e1da901f2f60906ef4ba7f8663f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -472,6 +475,32 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>None (void). </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This is an older syntax used by this library prior to the SPITFT library. New code should avoid it. </dd></dl>
+
+</div>
+</div>
+<a id="ab6c6ab994b9f02464994af1378342ee5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6c6ab994b9f02464994af1378342ee5">&#9670;&nbsp;</a></span>enableDisplay()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Adafruit_SSD1351::enableDisplay </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>enable</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Change whether display is on or off. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">enable</td><td>True if you want the display ON, false OFF </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
