@@ -18,9 +18,10 @@
  *
  * @section dependencies Dependencies
  *
- * This library depends on <a href="https://github.com/adafruit/Adafruit-GFX-Library">
- * Adafruit_GFX</a> being present on your system. Please make sure you have
- * installed the latest version before using this library.
+ * This library depends on <a
+ * href="https://github.com/adafruit/Adafruit-GFX-Library"> Adafruit_GFX</a>
+ * being present on your system. Please make sure you have installed the latest
+ * version before using this library.
  *
  * @section author Author
  *
@@ -35,20 +36,20 @@
 #include "Adafruit_SSD1351.h"
 
 // TODO: this will be moved to SPITFT, but for now:
-#if defined (ARDUINO_ARCH_ARC32)
-  #define SPI_DEFAULT_FREQ 16000000 ///< ARC32 SPI default frequency
-#elif defined (__AVR__) || defined(TEENSYDUINO)
-  #define SPI_DEFAULT_FREQ 8000000 ///< AVR SPI default frequency
+#if defined(ARDUINO_ARCH_ARC32)
+#define SPI_DEFAULT_FREQ 16000000 ///< ARC32 SPI default frequency
+#elif defined(__AVR__) || defined(TEENSYDUINO)
+#define SPI_DEFAULT_FREQ 8000000 ///< AVR SPI default frequency
 #elif defined(__SAMD51__)
-  #define SPI_DEFAULT_FREQ 12000000 ///< M4 SPI default frequency
-#elif defined(ESP8266) || defined (ARDUINO_MAXIM)
-  #define SPI_DEFAULT_FREQ 16000000 ///< ESP8266 SPI default frequency
+#define SPI_DEFAULT_FREQ 12000000 ///< M4 SPI default frequency
+#elif defined(ESP8266) || defined(ARDUINO_MAXIM)
+#define SPI_DEFAULT_FREQ 16000000 ///< ESP8266 SPI default frequency
 #elif defined(ESP32)
-  #define SPI_DEFAULT_FREQ 24000000 ///< ESP32 SPI default frequency
+#define SPI_DEFAULT_FREQ 24000000 ///< ESP32 SPI default frequency
 #elif defined(RASPI)
-  #define SPI_DEFAULT_FREQ 24000000 ///< RASPI SPI default frequency
+#define SPI_DEFAULT_FREQ 24000000 ///< RASPI SPI default frequency
 #else
-  #define SPI_DEFAULT_FREQ 24000000 ///< SPI default frequency
+#define SPI_DEFAULT_FREQ 24000000 ///< SPI default frequency
 #endif
 
 /*!
@@ -77,10 +78,11 @@
     @note    Call the object's begin() function before use.
 */
 Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
-  int8_t cs_pin, int8_t dc_pin, int8_t mosi_pin, int8_t sclk_pin,
-  int8_t rst_pin) : Adafruit_SPITFT(width, height, cs_pin, dc_pin,
-  mosi_pin, sclk_pin, rst_pin, -1) {
-}
+                                   int8_t cs_pin, int8_t dc_pin,
+                                   int8_t mosi_pin, int8_t sclk_pin,
+                                   int8_t rst_pin)
+    : Adafruit_SPITFT(width, height, cs_pin, dc_pin, mosi_pin, sclk_pin,
+                      rst_pin, -1) {}
 
 /*!
     @brief   Constructor for SSD1351 displays, using native hardware SPI.
@@ -106,11 +108,13 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
 */
 
 Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
-  SPIClass *spi, int8_t cs_pin, int8_t dc_pin, int8_t rst_pin) :
+                                   SPIClass *spi, int8_t cs_pin, int8_t dc_pin,
+                                   int8_t rst_pin)
+    :
 #if defined(ESP8266)
-  Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
+      Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
 #else
-  Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin) {
+      Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin){
 #endif
 }
 
@@ -140,10 +144,10 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
     @note    Call the object's begin() function before use.
 */
 Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin,
-  int8_t mosi_pin, int8_t sclk_pin, int8_t rst_pin) :
-  Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, mosi_pin,
-  sclk_pin, rst_pin, -1) {
-}
+                                   int8_t mosi_pin, int8_t sclk_pin,
+                                   int8_t rst_pin)
+    : Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, mosi_pin,
+                      sclk_pin, rst_pin, -1) {}
 
 /*!
     @brief   DEPRECATED constructor for SSD1351 displays, using native
@@ -166,53 +170,75 @@ Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin,
     @return  Adafruit_SSD1351 object.
     @note    Call the object's begin() function before use.
 */
-Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin, int8_t rst_pin) :
+Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin, int8_t rst_pin)
+    :
 #if defined(ESP8266)
-  Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, rst_pin)
+      Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, rst_pin)
 #else
-  Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, &SPI, cs_pin, dc_pin, rst_pin) 
+      Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, &SPI, cs_pin, dc_pin,
+                      rst_pin)
 #endif
-{ }
+{
+}
 
 /*!
     @brief  Destructor for Adafruit_SSD1351 object.
 */
-Adafruit_SSD1351::~Adafruit_SSD1351(void) {
-}
+Adafruit_SSD1351::~Adafruit_SSD1351(void) {}
 
 // INIT DISPLAY ------------------------------------------------------------
 
 static const uint8_t PROGMEM initList[] = {
-  SSD1351_CMD_COMMANDLOCK, 1, // Set command lock, 1 arg
+    SSD1351_CMD_COMMANDLOCK,
+    1, // Set command lock, 1 arg
     0x12,
-  SSD1351_CMD_COMMANDLOCK, 1, // Set command lock, 1 arg
+    SSD1351_CMD_COMMANDLOCK,
+    1, // Set command lock, 1 arg
     0xB1,
-  SSD1351_CMD_DISPLAYOFF, 0,  // Display off, no args
-  SSD1351_CMD_CLOCKDIV, 1,
+    SSD1351_CMD_DISPLAYOFF,
+    0, // Display off, no args
+    SSD1351_CMD_CLOCKDIV,
+    1,
     0xF1, // 7:4 = Oscillator Freq, 3:0 = CLK Div Ratio (A[3:0]+1 = 1..16)
-  SSD1351_CMD_MUXRATIO, 1,
+    SSD1351_CMD_MUXRATIO,
+    1,
     127,
-  SSD1351_CMD_DISPLAYOFFSET, 1,
+    SSD1351_CMD_DISPLAYOFFSET,
+    1,
     0x0,
-  SSD1351_CMD_SETGPIO, 1,
+    SSD1351_CMD_SETGPIO,
+    1,
     0x00,
-  SSD1351_CMD_FUNCTIONSELECT, 1,
-    0x01,  // internal (diode drop)
-  SSD1351_CMD_PRECHARGE, 1,
+    SSD1351_CMD_FUNCTIONSELECT,
+    1,
+    0x01, // internal (diode drop)
+    SSD1351_CMD_PRECHARGE,
+    1,
     0x32,
-  SSD1351_CMD_VCOMH, 1,
+    SSD1351_CMD_VCOMH,
+    1,
     0x05,
-  SSD1351_CMD_NORMALDISPLAY, 0,
-  SSD1351_CMD_CONTRASTABC, 3,
-    0xC8, 0x80, 0xC8,
-  SSD1351_CMD_CONTRASTMASTER, 1,
+    SSD1351_CMD_NORMALDISPLAY,
+    0,
+    SSD1351_CMD_CONTRASTABC,
+    3,
+    0xC8,
+    0x80,
+    0xC8,
+    SSD1351_CMD_CONTRASTMASTER,
+    1,
     0x0F,
-  SSD1351_CMD_SETVSL, 3,
-    0xA0, 0xB5, 0x55,
-  SSD1351_CMD_PRECHARGE2, 1,
+    SSD1351_CMD_SETVSL,
+    3,
+    0xA0,
+    0xB5,
+    0x55,
+    SSD1351_CMD_PRECHARGE2,
+    1,
     0x01,
-  SSD1351_CMD_DISPLAYON, 0, // Main screen turn on
-  0 }; // END OF COMMAND LIST
+    SSD1351_CMD_DISPLAYON,
+    0,  // Main screen turn on
+    0}; // END OF COMMAND LIST
 
 /*!
     @brief   Initialize SSD1351 chip. Configures pins, connects to the
@@ -224,13 +250,14 @@ static const uint8_t PROGMEM initList[] = {
 */
 void Adafruit_SSD1351::begin(uint32_t freq) {
 
-  if(!freq) freq = SPI_DEFAULT_FREQ; // Will move to SPITFT initSPI
+  if (!freq)
+    freq = SPI_DEFAULT_FREQ; // Will move to SPITFT initSPI
   initSPI(freq);
 
   const uint8_t *addr = (const uint8_t *)initList;
-  uint8_t        cmd, x, numArgs;
+  uint8_t cmd, x, numArgs;
 
-  while((cmd = pgm_read_byte(addr++)) > 0) { // '0' command ends list
+  while ((cmd = pgm_read_byte(addr++)) > 0) { // '0' command ends list
     x = pgm_read_byte(addr++);
     numArgs = x & 0x7F;
     if (cmd != 0xFF) { // '255' is ignored
@@ -269,27 +296,27 @@ void Adafruit_SSD1351::setRotation(uint8_t r) {
 
   rotation = r & 3; // Clip input to valid range
 
-  switch(rotation) {
-    case 0:
-      madctl |= 0b00010000; // Scan bottom-up
-      _width  = WIDTH;
-      _height = HEIGHT;
-      break;
-    case 1:
-      madctl |= 0b00010011; // Scan bottom-up, column remap 127-0, vertical
-      _width  = HEIGHT;
-      _height = WIDTH;
-      break;
-    case 2:
-      madctl |= 0b00000010; // Column remap 127-0
-      _width  = WIDTH;
-      _height = HEIGHT;
-      break;
-    case 3:
-      madctl |= 0b00000001; // Vertical
-      _width  = HEIGHT;
-      _height = WIDTH;
-      break;
+  switch (rotation) {
+  case 0:
+    madctl |= 0b00010000; // Scan bottom-up
+    _width = WIDTH;
+    _height = HEIGHT;
+    break;
+  case 1:
+    madctl |= 0b00010011; // Scan bottom-up, column remap 127-0, vertical
+    _width = HEIGHT;
+    _height = WIDTH;
+    break;
+  case 2:
+    madctl |= 0b00000010; // Column remap 127-0
+    _width = WIDTH;
+    _height = HEIGHT;
+    break;
+  case 3:
+    madctl |= 0b00000001; // Vertical
+    _width = HEIGHT;
+    _height = WIDTH;
+    break;
   }
 
   sendCommand(SSD1351_CMD_SETREMAP, &madctl, 1);
@@ -317,11 +344,9 @@ void Adafruit_SSD1351::invertDisplay(boolean i) {
     @note    This is an older syntax used by this library prior to the
              SPITFT library. New code should avoid it.
 */
-void Adafruit_SSD1351::invert(boolean i) {
-  invertDisplay(i);
-}
+void Adafruit_SSD1351::invert(boolean i) { invertDisplay(i); }
 
-#define ssd1351_swap(a, b) \
+#define ssd1351_swap(a, b)                                                     \
   (((a) ^= (b)), ((b) ^= (a)), ((a) ^= (b))) ///< No-temp-var swap operation
 
 /*!
@@ -338,22 +363,21 @@ void Adafruit_SSD1351::invert(boolean i) {
              Height of rectangle.
     @return  None (void).
 */
-void Adafruit_SSD1351::setAddrWindow(
-  uint16_t x1, uint16_t y1, uint16_t w, uint16_t h) {
+void Adafruit_SSD1351::setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w,
+                                     uint16_t h) {
 
-  uint16_t x2 = x1 + w - 1,
-           y2 = y1 + h - 1;
-  if(rotation & 1) { // Vertical address increment mode
+  uint16_t x2 = x1 + w - 1, y2 = y1 + h - 1;
+  if (rotation & 1) { // Vertical address increment mode
     ssd1351_swap(x1, y1);
     ssd1351_swap(x2, y2);
   }
   writeCommand(SSD1351_CMD_SETCOLUMN); // X range
   spiWrite(x1);
   spiWrite(x2);
-  writeCommand(SSD1351_CMD_SETROW);    // Y range
+  writeCommand(SSD1351_CMD_SETROW); // Y range
   spiWrite(y1);
   spiWrite(y2);
-  writeCommand(SSD1351_CMD_WRITERAM);  // Begin write
+  writeCommand(SSD1351_CMD_WRITERAM); // Begin write
 }
 
 /**************************************************************************/
