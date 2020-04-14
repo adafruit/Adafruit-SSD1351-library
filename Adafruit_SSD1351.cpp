@@ -44,6 +44,8 @@
 #define SPI_DEFAULT_FREQ 12000000 ///< M4 SPI default frequency
 #elif defined(ESP8266) || defined(ARDUINO_MAXIM)
 #define SPI_DEFAULT_FREQ 16000000 ///< ESP8266 SPI default frequency
+#elif defined(__SAM3X8E__)
+#define SPI_DEFAULT_FREQ 20000000 ///< SAM3X (ARDUINO DUE) SPI default frequency
 #elif defined(ESP32)
 #define SPI_DEFAULT_FREQ 24000000 ///< ESP32 SPI default frequency
 #elif defined(RASPI)
@@ -112,6 +114,8 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
                                    int8_t rst_pin)
     :
 #if defined(ESP8266)
+      Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
+#elif defined(__SAM3X8E__)
       Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
 #else
       Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin){
