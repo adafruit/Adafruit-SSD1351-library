@@ -42,6 +42,8 @@
 #define SPI_DEFAULT_FREQ 8000000 ///< AVR SPI default frequency
 #elif defined(__SAMD51__)
 #define SPI_DEFAULT_FREQ 12000000 ///< M4 SPI default frequency
+#elif defined(ARDUINO_SAMD_ZERO)
+#define SPI_DEFAULT_FREQ 12000000 ///< M0 SPI default frequency
 #elif defined(ESP8266) || defined(ARDUINO_MAXIM)
 #define SPI_DEFAULT_FREQ 16000000 ///< ESP8266 SPI default frequency
 #elif defined(__SAM3X8E__)
