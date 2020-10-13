@@ -49,7 +49,7 @@
 #elif defined(__SAM3X8E__)
 #define SPI_DEFAULT_FREQ 20000000 ///< SAM3X (ARDUINO DUE) SPI default frequency
 #elif defined(ESP32)
-#define SPI_DEFAULT_FREQ 24000000 ///< ESP32 SPI default frequency
+#define SPI_DEFAULT_FREQ 16000000 ///< ESP32 SPI default frequency
 #elif defined(RASPI)
 #define SPI_DEFAULT_FREQ 24000000 ///< RASPI SPI default frequency
 #else
