@@ -52,6 +52,8 @@
 #define SPI_DEFAULT_FREQ 16000000 ///< ESP32 SPI default frequency
 #elif defined(RASPI)
 #define SPI_DEFAULT_FREQ 24000000 ///< RASPI SPI default frequency
+#elif defined(ARDUINO_NRF52840_FEATHER)
+#define SPI_DEFAULT_FREQ 16000000 ///< NRF52840 SPI default frequency
 #else
 #define SPI_DEFAULT_FREQ 24000000 ///< SPI default frequency
 #endif
