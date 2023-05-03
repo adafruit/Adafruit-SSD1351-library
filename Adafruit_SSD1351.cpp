@@ -35,28 +35,7 @@
 
 #include "Adafruit_SSD1351.h"
 
-// TODO: this will be moved to SPITFT, but for now:
-#if defined(ARDUINO_ARCH_ARC32)
-#define SPI_DEFAULT_FREQ 16000000 ///< ARC32 SPI default frequency
-#elif defined(__AVR__) || defined(TEENSYDUINO)
-#define SPI_DEFAULT_FREQ 8000000 ///< AVR SPI default frequency
-#elif defined(__SAMD51__)
-#define SPI_DEFAULT_FREQ 12000000 ///< M4 SPI default frequency
-#elif defined(ARDUINO_SAMD_ZERO)
-#define SPI_DEFAULT_FREQ 12000000 ///< M0 SPI default frequency
-#elif defined(ESP8266) || defined(ARDUINO_MAXIM)
-#define SPI_DEFAULT_FREQ 16000000 ///< ESP8266 SPI default frequency
-#elif defined(__SAM3X8E__)
-#define SPI_DEFAULT_FREQ 20000000 ///< SAM3X (ARDUINO DUE) SPI default frequency
-#elif defined(ESP32)
-#define SPI_DEFAULT_FREQ 16000000 ///< ESP32 SPI default frequency
-#elif defined(RASPI)
-#define SPI_DEFAULT_FREQ 24000000 ///< RASPI SPI default frequency
-#elif defined(ARDUINO_NRF52840_FEATHER)
-#define SPI_DEFAULT_FREQ 16000000 ///< NRF52840 SPI default frequency
-#else
-#define SPI_DEFAULT_FREQ 24000000 ///< SPI default frequency
-#endif
+#define SPI_DEFAULT_FREQ 8000000 ///< SPI default frequency
 
 /*!
     @brief   Constructor for SSD1351 displays, using software (bitbang) SPI.
