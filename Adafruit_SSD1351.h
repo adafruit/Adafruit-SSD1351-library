@@ -17,9 +17,10 @@
  * please support Adafruit and open-source hardware by purchasing
  * products from Adafruit!
  *
- * This library depends on <a href="https://github.com/adafruit/Adafruit_GFX">
- * Adafruit_GFX</a> being present on your system. Please make sure you have
- * installed the latest version before using this library.
+ * This library depends on <a
+ * href="https://github.com/adafruit/Adafruit-GFX-Library"> Adafruit_GFX</a>
+ * being present on your system. Please make sure you have installed the latest
+ * version before using this library.
  *
  * Written by Limor Fried/Ladyada for Adafruit Industries, with
  * contributions from the open source community.
