@@ -101,7 +101,7 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
 #elif defined(__SAM3X8E__)
       Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
 #else
-      Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin){
+      Adafruit_SPITFT(width, height, spi, cs_pin, dc_pin, rst_pin) {
 #endif
 }
 
