@@ -63,9 +63,9 @@
     @note    Call the object's begin() function before use.
 */
 Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
-                                   int8_t cs_pin, int8_t dc_pin,
-                                   int8_t mosi_pin, int8_t sclk_pin,
-                                   int8_t rst_pin)
+                                   int16_t cs_pin, int16_t dc_pin,
+                                   int16_t mosi_pin, int16_t sclk_pin,
+                                   int16_t rst_pin)
     : Adafruit_SPITFT(width, height, cs_pin, dc_pin, mosi_pin, sclk_pin,
                       rst_pin, -1) {}
 
@@ -93,8 +93,8 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
 */
 
 Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
-                                   SPIClass *spi, int8_t cs_pin, int8_t dc_pin,
-                                   int8_t rst_pin)
+                                   SPIClass *spi, int16_t cs_pin,
+                                   int16_t dc_pin, int16_t rst_pin)
     :
 #if defined(ESP8266)
       Adafruit_SPITFT(width, height, cs_pin, dc_pin, rst_pin) {
@@ -130,9 +130,9 @@ Adafruit_SSD1351::Adafruit_SSD1351(uint16_t width, uint16_t height,
     @return  Adafruit_SSD1351 object.
     @note    Call the object's begin() function before use.
 */
-Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin,
-                                   int8_t mosi_pin, int8_t sclk_pin,
-                                   int8_t rst_pin)
+Adafruit_SSD1351::Adafruit_SSD1351(int16_t cs_pin, int16_t dc_pin,
+                                   int16_t mosi_pin, int16_t sclk_pin,
+                                   int16_t rst_pin)
     : Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, mosi_pin,
                       sclk_pin, rst_pin, -1) {}
 
@@ -157,7 +157,8 @@ Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin,
     @return  Adafruit_SSD1351 object.
     @note    Call the object's begin() function before use.
 */
-Adafruit_SSD1351::Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin, int8_t rst_pin)
+Adafruit_SSD1351::Adafruit_SSD1351(int16_t cs_pin, int16_t dc_pin,
+                                   int16_t rst_pin)
     :
 #if defined(ESP8266)
       Adafruit_SPITFT(SSD1351WIDTH, SSD1351HEIGHT, cs_pin, dc_pin, rst_pin)
