@@ -79,19 +79,19 @@ class Adafruit_SSD1351 : public Adafruit_SPITFT {
 public:
   // NEW CONSTRUCTORS -- recommended for new projects
   // 6-7 args using soft SPI (reset optional)
-  Adafruit_SSD1351(uint16_t width, uint16_t height, int8_t cs_pin,
-                   int8_t dc_pin, int8_t mosi_pin, int8_t sclk_pin,
-                   int8_t rst_pin = -1);
+  Adafruit_SSD1351(uint16_t width, uint16_t height, int16_t cs_pin,
+                   int16_t dc_pin, int16_t mosi_pin, int16_t sclk_pin,
+                   int16_t rst_pin = -1);
   // 5-6 args using hardware SPI (must specify peripheral) (reset optional)
   Adafruit_SSD1351(uint16_t width, uint16_t height, SPIClass *spi,
-                   int8_t cs_pin, int8_t dc_pin, int8_t rst_pin = -1);
+                   int16_t cs_pin, int16_t dc_pin, int16_t rst_pin = -1);
 
   // DEPRECATED CONSTRUCTORS for back compatibility, avoid in new projects
   // 4-5 args using soft SPI (reset optional)
-  Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin, int8_t mosi_pin,
-                   int8_t sclk_pin, int8_t rst_pin = -1);
+  Adafruit_SSD1351(int16_t cs_pin, int16_t dc_pin, int16_t mosi_pin,
+                   int16_t sclk_pin, int16_t rst_pin = -1);
   // 2-3 args using default hardware SPI peripheral (reset optional)
-  Adafruit_SSD1351(int8_t cs_pin, int8_t dc_pin, int8_t rst_pin = -1);
+  Adafruit_SSD1351(int16_t cs_pin, int16_t dc_pin, int16_t rst_pin = -1);
 
   ~Adafruit_SSD1351(void);
 
